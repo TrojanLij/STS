@@ -29,9 +29,15 @@
 [![MIT License][license-shield]][license-url]
 
 </div>
-
 <div align="center">
-     <b>This project has many bugs. If you want to help please report them!</b>
+<b>This project has many bugs. If you want to help please report them!</b>
+</div>
+
+</div>
+<div align="center">
+
+[![Discord][discord-shield]][discord-url]
+
 </div>
 
 # About
