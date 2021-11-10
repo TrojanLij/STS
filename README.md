@@ -108,6 +108,6 @@ If you want to go rummaging around the code and are interested in any advanced c
 [issues-shield]: https://img.shields.io/github/issues/TrojanLij/STS.svg?style=for-the-badge
 [issues-url]: https://github.com/TrojanLij/STS/issues
 [license-shield]: https://img.shields.io/github/license/TrojanLij/STS.svg?style=for-the-badge
-[license-url]: https://github.com/TrojanLij/STS/blob/master/LICENSE.txt
+[license-url]: https://github.com/TrojanLij/STS/blob/main/LICENSE.txt
 
 
