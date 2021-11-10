@@ -36,7 +36,7 @@
 </div>
 <div align="center">
 
-[![Discord][discord-shield]][discord-url]
+[![Discord][discord-shield]]
 
 </div>
 
