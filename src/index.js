@@ -411,6 +411,7 @@ async function delHook(webhook) {
     return error;
   }
 }
+
 if (token) {
   startUpDiscordBot(token);
 }
