@@ -110,5 +110,7 @@ If you want to go rummaging around the code and are interested in any advanced c
 [issues-url]: https://github.com/TrojanLij/STS/issues
 [license-shield]: https://img.shields.io/github/license/TrojanLij/STS.svg?style=for-the-badge
 [license-url]: https://github.com/TrojanLij/STS/blob/main/LICENSE.txt
+[discord-shield]: https://img.shields.io/discord/780429830184239144?label=Discord&style=for-the-badge
+[discord-url]: https://discord.gg/kBdkUBywz6
 
 
