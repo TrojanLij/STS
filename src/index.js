@@ -3,7 +3,7 @@ const { Client, Intents } = require("discord.js");
 const _ = require("lodash");
 const { token, ignoreErrors, prefix } = require("../conf.json");
 const { scamHookUrls, reportHookUrl } = require("../webhooks.json");
-
+const whois = require('whois');
 const { getUserLogonEmbed } = require("./userLoginEmbed");
 const { getUserPasswordChangeEmbed } = require("./userPasswordChangeEmbed");
 const { getCreditCardEmbed } = require("./creditCardAddedEmbed");
@@ -371,6 +371,22 @@ async function startUpDiscordBot(token) {
       },
     ]
   );
+  commands.createCommand(
+    ["whois"],
+    "Check URL WHOIS information",
+    async (args, reply) => {
+      for (let i = 0; i < args.length; i++) {
+        reply(`\`\`\`${await whoIsPromise(args[i])}\`\`\``);
+      }
+    },
+    [
+      {
+        name: "whois",
+        description: "Will return WHOIS information of the URL",
+        required: true,
+      },
+    ]
+  );
   commands.initSlashCommands();
 }
 
@@ -393,6 +409,18 @@ async function delHook(webhook) {
 }
 if (token) {
   startUpDiscordBot(token);
+}
+
+function whoIsPromise(url) {
+  return new Promise((resolve, reject) => {
+      whois.lookup(url, (err, data) => {
+          if (err) {
+              reject(err)
+          } else {
+              resolve(data)
+          }
+      })
+  })
 }
 
 start(10);

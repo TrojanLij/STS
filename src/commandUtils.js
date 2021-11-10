@@ -102,7 +102,7 @@ function createCommandHandler(client, prefix) {
       if (ref) {
         ref.handler(
           getCommandArgs(msg),
-          (payload) => msg.channel.send(payload),
+          (payload) => msg.channel.send(payload, { split: true }),
           split,
           msg,
           ref
