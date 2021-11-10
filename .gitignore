@@ -1,0 +1,14 @@
+# file systems
+.history
+node_modules
+
+#configuration or environment files
+conf.json
+.env
+.eslintrc.js
+
+# log files
+log
+
+# resource files
+resources
