@@ -12,6 +12,7 @@
     "fs": "^0.0.1-security",
     "lodash": "^4.17.21",
     "moment": "^2.29.1",
+    "parse-whois": "^1.0.0",
     "password-generator": "^2.3.2",
     "random-ipv4": "^1.0.2",
     "whois": "^2.13.7",

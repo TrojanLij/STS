@@ -376,7 +376,11 @@ async function startUpDiscordBot(token) {
     "Check URL WHOIS information",
     async (args, reply) => {
       for (let i = 0; i < args.length; i++) {
-        reply(`\`\`\`${await whoIsPromise(args[i])}\`\`\``);
+        let result = await whoIsPromise(args[i]);
+        const array = result.match(/.{1,2000}/g);
+        for(let m of array) {
+            await reply(m);
+        }
       }
     },
     [
