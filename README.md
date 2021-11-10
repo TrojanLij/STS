@@ -51,8 +51,8 @@ _For NodeJS requirements and package requirements read **package.json**._
 
 # Installation
 ```bash
-git clone https://(https://github.com/TrojanLij/spam-the-scam-bot.git)
-cd spam-the-scam-bot
+git clone https://(https://github.com/TrojanLij/STS.git)
+cd STS
 npm install
 node .\app.js
 ```
@@ -99,13 +99,13 @@ If you want to go rummaging around the code and are interested in any advanced c
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/TrojanLij/spam-the-scam-bot.svg?style=for-the-badge
-[contributors-url]: https://github.com/TrojanLij/spam-the-scam-bot/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/TrojanLij/spam-the-scam-bot.svg?style=for-the-badge
-[forks-url]: https://github.com/TrojanLij/spam-the-scam-bot/network/members
-[stars-shield]: https://img.shields.io/github/stars/TrojanLij/spam-the-scam-bot.svg?style=for-the-badge
-[stars-url]: https://github.com/TrojanLij/spam-the-scam-bot/stargazers
-[issues-shield]: https://img.shields.io/github/issues/TrojanLij/spam-the-scam-bot.svg?style=for-the-badge
-[issues-url]: https://github.com/TrojanLij/spam-the-scam-bot/issues
-[license-shield]: https://img.shields.io/github/license/TrojanLij/spam-the-scam-bot.svg?style=for-the-badge
-[license-url]: https://github.com/TrojanLij/spam-the-scam-bot/blob/master/LICENSE.txt
+[contributors-shield]: https://img.shields.io/github/contributors/TrojanLij/STS.svg?style=for-the-badge
+[contributors-url]: https://github.com/TrojanLij/STS/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/TrojanLij/STS.svg?style=for-the-badge
+[forks-url]: https://github.com/TrojanLij/STS/network/members
+[stars-shield]: https://img.shields.io/github/stars/TrojanLij/STS.svg?style=for-the-badge
+[stars-url]: https://github.com/TrojanLij/STS/stargazers
+[issues-shield]: https://img.shields.io/github/issues/TrojanLij/STS.svg?style=for-the-badge
+[issues-url]: https://github.com/TrojanLij/STS/issues
+[license-shield]: https://img.shields.io/github/license/TrojanLij/STS.svg?style=for-the-badge
+[license-url]: https://github.com/TrojanLij/STS/blob/master/LICENSE.txt
