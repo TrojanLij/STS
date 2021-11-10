@@ -88,6 +88,7 @@ If you want to go rummaging around the code and are interested in any advanced c
 ## Important TODO:
 - [x] Add ability to run even **WITHOUT** Discord bot token (why limit to bots only)
 - [ ] Add pre-run self configuration and necessary file generation with instructions
+- [ ] @TrojanLij Learn to GIT!!!!
 
 ## TODO Update:
 - [x] Ability to add multiple webhooks that belong to hackers (get uploaded to a cdn)
