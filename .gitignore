@@ -12,3 +12,6 @@ log
 
 # resource files
 resources
+
+# Webhooks
+webhooks.json
