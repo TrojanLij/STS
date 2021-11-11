@@ -37,7 +37,7 @@
 <div align="center">
 
 [![Discord][discord-shield]][discord-url]
-
+<i>-- <a href="https://discord.gg/kBdkUBywz6" target="_blank">https://discord.gg/kBdkUBywz6</a> --</i>
 </div>
 
 # About
