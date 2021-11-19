@@ -29,7 +29,7 @@ let scamWebhooks = [];
 let reportWebhook = ""; // report webhook?
 let multiplyTimer = 1;
 
-const startTime = new Date();
+const startTime = Date.now();
 const socketRetries = new Map();
 let signature = {};
 
