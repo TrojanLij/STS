@@ -1,6 +1,7 @@
 require("dotenv").config();
 const { Client, Intents } = require("discord.js");
 const _ = require("lodash");
+const fs = require("fs");
 const { token, ignoreErrors, prefix } = require("../conf.json");
 const { scamHookUrls, reportHookUrl } = require("../webhooks.json");
 const whois = require('whois');
@@ -176,7 +177,7 @@ async function startUpDiscordBot(token) {
 
   let last = "";
   setInterval(() => {
-    const gen = `Sent ${sent} request`;
+    const gen = `Sent ${sent} request | ${prefix}help`;
     if (last === gen) {
       return;
     }
@@ -256,6 +257,7 @@ async function startUpDiscordBot(token) {
     "credit-card",
     "user-logon",
   ];
+
   commands.createCommand(
     ["test"],
     "Test the bot",
@@ -373,26 +375,65 @@ async function startUpDiscordBot(token) {
   );
 
   commands.createCommand(
-    ["whois"],
-    "Check URL WHOIS information",
+    ["add-hook"],
+    "Add for hook",
     async (args, reply) => {
+      const readWH = fs.readFileSync("./webhooks.json");
+      let readData = JSON.parse(readWH);
       for (let i = 0; i < args.length; i++) {
-        let result = await whoIsPromise(args[i]);
-        const array = result.match(/.{1,2000}/g);
-        for(let m of array) {
-            await reply(m);
+        try {
+          let check = await checkHook(args[i]);
+          if (check == 200 ){
+            // returned HTTP 200
+            readData.scamHookUrls.push(args[i]);
+          } else {
+            reply(`Hook ${i + 1} returned: Status *${check}*`);
+          }
+        } catch (error) {
+          console.log(`Something went wrong ${error}`);
         }
+      }
+      
+      try {
+        fs.writeFileSync("./webhooks.json", JSON.stringify(readData, undefined, 2));
+        if(process.env.NODE_ENV == 'production'){
+          scamWebhooks = readData.scamHookUrls;
+        }
+        reply(`updated scam webhook list`);
+      } catch (error) {
+        console.log(error);
       }
     },
     [
       {
-        name: "whois",
-        description: "Will return WHOIS information of the URL",
+        name: "hook",
+        description: "Will add the hooker to the list",
         required: true,
       },
     ]
   );
-  
+
+  // commands.createCommand(
+  //   ["whois"],
+  //   "Check URL WHOIS information",
+  //   async (args, reply) => {
+  //     for (let i = 0; i < args.length; i++) {
+  //       let result = await whoIsPromise(args[i]);
+  //       const array = result.match(/.{1,2000}/g);
+  //       for(let m of array) {
+  //           await reply(m);
+  //       }
+  //     }
+  //   },
+  //   [
+  //     {
+  //       name: "whois",
+  //       description: "Will return WHOIS information of the URL",
+  //       required: true,
+  //     },
+  //   ]
+  // );
+
   commands.initSlashCommands();
 }
 

@@ -91,18 +91,20 @@ If you want to go rummaging around the code and are interested in any advanced c
 - [x] Add a completed TODO list item.
 -->
 
-## Important TODO:
+## TODO Important:
 - [x] Add ability to run even **WITHOUT** Discord bot token (why limit to bots only)
-- [ ] Add pre-run self configuration and necessary file generation with instructions
+- [ ] Fix some of the /commands
+- [ ] Add pre-run self configuration and necessary file generation with instructions (mostly done)
 - [ ] @TrojanLij Learn to GIT!!!!
 
 ## TODO Update:
 - [x] Ability to add multiple webhooks that belong to hackers (get uploaded to a cdn)
-- [ ] An initialization stage before everything runs (basic logic done)
-- [ ] A random RR bc why the hell now
-- [ ] Fetch every X seconds a list of scam webhooks
 - [ ] If a 404 for WH, try again, if another 404, wait 60s then try last time.
-- If last time 404 then return in reportHook *Tango down*
+`--> If last time 404 then return in reportHook *Tango down*`
+
+## TODO Later:
+- [ ] A random RR bc why the hell now (added to *do later*)
+- [ ] Fetch every X seconds a list of scam webhooks
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
