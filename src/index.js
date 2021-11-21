@@ -371,6 +371,7 @@ async function startUpDiscordBot(token) {
       },
     ]
   );
+
   commands.createCommand(
     ["whois"],
     "Check URL WHOIS information",
@@ -391,6 +392,7 @@ async function startUpDiscordBot(token) {
       },
     ]
   );
+  
   commands.initSlashCommands();
 }
 
