@@ -4,7 +4,6 @@ const _ = require("lodash");
 const fs = require("fs");
 const { token, ignoreErrors, prefix } = require("../conf.json");
 const { scamHookUrls, reportHookUrl } = require("../webhooks.json");
-const whois = require('whois');
 const { getUserLogonEmbed } = require("./userLoginEmbed");
 const { getUserPasswordChangeEmbed } = require("./userPasswordChangeEmbed");
 const { getCreditCardEmbed } = require("./creditCardAddedEmbed");
@@ -157,7 +156,6 @@ function start(instances) {
       console.log(`Started in NODE_ENV: ${process.env.NODE_ENV}`);
       break;
   }
-
   instancesSpawner(instances);
 }
 
@@ -462,18 +460,6 @@ async function shutHook(webhook) {
 
 if (token) {
   startUpDiscordBot(token);
-}
-
-function whoIsPromise(url) {
-  return new Promise((resolve, reject) => {
-      whois.lookup(url, (err, data) => {
-          if (err) {
-              reject(err)
-          } else {
-              resolve(data)
-          }
-      })
-  })
 }
 
 start(10);
