@@ -16,3 +16,6 @@ resources
 # Webhooks
 
 webhooks.json
+
+
+spam_locker.js
