@@ -103,7 +103,7 @@ If you want to go rummaging around the code and are interested in any advanced c
   - [ ] `--> If last time 404 then return in reportHook *Tango down*`
 
 ## TODO Discord bot /FEATURES/:
-- [ ] /HOOK/:
+- [ ] **/HOOK/:**
   - [x] Add `add-hook` command
   - [ ] Change `del-hook` to remove hook instead of sending DELETE request
   - [x] Set `shut-hook` to send DELETE request 
