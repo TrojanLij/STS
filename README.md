@@ -100,7 +100,7 @@ If you want to go rummaging around the code and are interested in any advanced c
 ## TODO Update:
 - [x] Ability to add multiple webhooks that belong to hackers
 - [ ] If a 404 for WH, try again, if another 404, wait 60s then try last time.
-`--> If last time 404 then return in reportHook *Tango down*`
+  - [ ]`--> If last time 404 then return in reportHook *Tango down*`
 
 ## TODO Discord bot /FEATURES/:
 - [x] Add `add-hook` command
