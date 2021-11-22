@@ -234,7 +234,12 @@ async function startUpDiscordBot(token) {
             {
               name: "Failed request? *(oh no)*",
               value: `\`${failed}\``,
-              inline: false,
+              inline: true,
+            },
+            {
+              name: "Count hooks",
+              value: `\`${scamWebhooks.length}\``,
+              inline: true,
             },
           ],
           image: {
