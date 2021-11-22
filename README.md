@@ -105,8 +105,11 @@ If you want to go rummaging around the code and are interested in any advanced c
 ## TODO Discord bot /FEATURES/:
 - [ ] **/HOOK/:**
   - [x] Add `add-hook` command
-  - [ ] Change `del-hook` to remove hook instead of sending DELETE request
-  - [x] Set `shut-hook` to send DELETE request 
+  - [x] `add-hook` checks the hooks status
+  - [x] Change `del-hook` to remove hook instead of sending DELETE request
+  - [x] `del-hook` checks if it is a valid hook, if true then sends DELETE then waits 5s to check again in case of error
+  - [x] Set `close-hook` to send DELETE request 
+  - [x] `close-hook` removes hook from local webhook.json if exists
 - [x] Add bot presence to display prefix
 
 ## TODO Later:

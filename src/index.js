@@ -345,17 +345,40 @@ async function startUpDiscordBot(token) {
   });
 
   commands.createCommand(
-    ["shut-hook"],
+    ["close-hook"],
     "Sends DELETE request to hook",
     async (args, reply) => {
+      const readWH = fs.readFileSync("./webhooks.json");
+      let readData = JSON.parse(readWH);
       await reply(`Requesting status for *${args.length}* hooks.`);
       for (let i = 0; i < args.length; i++) {
         if ((await checkHook(args[i])) != 404) {
-          reply(`${await shutHook(args[i])}`);
+          reply(`${await shutHook(args[i])}: checking again in 5s...`);
+          await delay(5000);
+          let stat = await checkHook(args[i]);
+          if (isNaN(stat)){
+            reply(`seems to be down... :) \`\`\`${stat}\`\`\``);
+            let index = readData.scamHookUrls.indexOf(args[i]);
+            readData.scamHookUrls.splice(index, 1);
+          } else {
+            reply(`${stat}`);
+          }
+          
         } else {
           reply(`404`);
         }
       }
+
+      try {
+        fs.writeFileSync("./webhooks.json", JSON.stringify(readData, undefined, 2));
+        if(process.env.NODE_ENV == 'production'){
+          scamWebhooks = readData.scamHookUrls;
+        }
+        reply(`updated scam webhook list`);
+      } catch (error) {
+        console.log(error);
+      }
+
     },
     [{ name: "url", description: "Will send DELETE request to the hooker", required: true }]
   );
@@ -416,26 +439,35 @@ async function startUpDiscordBot(token) {
     ]
   );
 
-  // commands.createCommand(
-  //   ["whois"],
-  //   "Check URL WHOIS information",
-  //   async (args, reply) => {
-  //     for (let i = 0; i < args.length; i++) {
-  //       let result = await whoIsPromise(args[i]);
-  //       const array = result.match(/.{1,2000}/g);
-  //       for(let m of array) {
-  //           await reply(m);
-  //       }
-  //     }
-  //   },
-  //   [
-  //     {
-  //       name: "whois",
-  //       description: "Will return WHOIS information of the URL",
-  //       required: true,
-  //     },
-  //   ]
-  // );
+  commands.createCommand(
+    ["del-hook"],
+    "Delete hook",
+    async (args, reply) => {
+      const readWH = fs.readFileSync("./webhooks.json");
+      let readData = JSON.parse(readWH);
+      for (let i = 0; i < args.length; i++) {
+        let index = readData.scamHookUrls.indexOf(args[i]);
+        readData.scamHookUrls.splice(index, 1);
+      }
+      
+      try {
+        fs.writeFileSync("./webhooks.json", JSON.stringify(readData, undefined, 2));
+        if(process.env.NODE_ENV == 'production'){
+          scamWebhooks = readData.scamHookUrls;
+        }
+        reply(`updated scam webhook list`);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    [
+      {
+        name: "hook",
+        description: "Will remove the hooker from the list",
+        required: true,
+      },
+    ]
+  );
 
   commands.initSlashCommands();
 }
