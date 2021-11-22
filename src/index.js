@@ -342,19 +342,19 @@ async function startUpDiscordBot(token) {
   });
 
   commands.createCommand(
-    ["del-hook"],
-    "Delete hook",
+    ["shut-hook"],
+    "Sends DELETE request to hook",
     async (args, reply) => {
       await reply(`Requesting status for *${args.length}* hooks.`);
       for (let i = 0; i < args.length; i++) {
         if ((await checkHook(args[i])) != 404) {
-          reply(`${await delHook(args[i])}`);
+          reply(`${await shutHook(args[i])}`);
         } else {
           reply(`404`);
         }
       }
     },
-    [{ name: "url", description: "Will delete the hooker", required: true }]
+    [{ name: "url", description: "Will send DELETE request to the hooker", required: true }]
   );
 
   commands.createCommand(
@@ -446,7 +446,7 @@ async function checkHook(webhook) {
   }
 }
 
-async function delHook(webhook) {
+async function shutHook(webhook) {
   try {
     let result = await axios.delete(webhook);
     return result.status;

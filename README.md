@@ -104,7 +104,9 @@ If you want to go rummaging around the code and are interested in any advanced c
 
 ## TODO Discord bot /FEATURES/:
 - [x] Add `add-hook` command
-- [x] Add bot presence to display prefix  
+- [x] Add bot presence to display prefix
+- [ ] Change `del-hook` to remove hook instead of sending DELETE request
+- [x] Set `shut-hook` to send DELETE request 
 
 ## TODO Later:
 - [ ] A random RR bc why the hell now (added to *do later*)
