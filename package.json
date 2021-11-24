@@ -7,6 +7,7 @@
     "@discordjs/builders": "^0.8.2",
     "@discordjs/rest": "^0.1.0-canary.0",
     "@types/node": "^16.11.6",
+    "@types/yargs": "^17.0.7",
     "axios": "^0.24.0",
     "creditcard-generator": "^0.0.7",
     "discord-api-types": "^0.24.0",

@@ -1,9 +1,8 @@
-import { Config, WebhookConfig } from "./interfaces";
-import { DEVELOPMENT } from "./utils";
+import { ConfigFSBinder } from "./configFSBinder";
 
-export function start(config: Config, webhooks: WebhookConfig) {
+
+export function start(configBinder: ConfigFSBinder) {
     if (DEVELOPMENT) {
-        console.log("ay it works");
-        console.log(config, webhooks);
+        console.log(configBinder.getConfig(), configBinder.getWebhook());
     }
 }
