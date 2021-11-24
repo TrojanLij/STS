@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+      "allowSyntheticDefaultImports": true,
+      "noImplicitAny": true,
+      "module": "CommonJS",
+      "target": "ESNext",
+      "allowJs": true,
+      "skipLibCheck": true ,
+      "lib": ["DOM"],
+      "outDir": "dist",
+    },
+    "files": ["src/index.ts"]
+  }
