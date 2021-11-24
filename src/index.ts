@@ -44,7 +44,6 @@ async function init() {
         if (process.argv.length > 2) {
             initYargs(configBinder);
         } else {
-            console.log("??");
             start(configBinder);
         }
 
