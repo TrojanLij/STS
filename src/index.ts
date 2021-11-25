@@ -1,4 +1,4 @@
-/// <reference path="fix.d.ts" />
+/// <reference path="typeFix/fix.d.ts" />
 import { access, constants, writeFile, readFile } from "fs-extra";
 import { Config, WebhookConfig } from "./interfaces";
 import { start } from "./start";

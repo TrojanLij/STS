@@ -1,4 +1,5 @@
 import { Rare } from "./interfaces";
+import * as randomIpv4 from "random-ipv4";
 
 export function createRare<D = any>(rareObjects: Rare<D>[]): D[] {
     const rareNumbers = rareObjects.map(r => r.rare);
@@ -36,6 +37,35 @@ export function removeItem<T>(items: T[], item: T): boolean {
 }
 
 
+export function randomString(length: number) {
+    const chars =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let result = "";
+    for (let i = length; i > 0; --i)
+        result += chars[Math.floor(Math.random() * chars.length)];
+    return result;
+}
+
+export function getRandomIp(): string {
+    return randomIpv4("{token1}.{token2}.{token3}.{token4}", {
+        token1: {
+            min: 1,
+            max: 254,
+        },
+        token2: {
+            min: 0,
+            max: 254,
+        },
+        token3: {
+            min: 0,
+            max: 254,
+        },
+        token4: {
+            min: 2,
+            max: 254,
+        },
+    });
+}
 
 // function getInjectionPath(user, appinfo) {
 //     return `C:\\Users\\${user}\\AppData\\Local\\Discord\\${appinfo}\\modules\\discord_desktop_core-1\\discord_desktop_core`;
@@ -110,7 +140,7 @@ export function removeItem<T>(items: T[], item: T): boolean {
 //         console.error(error);
 //     }
 //     return req;
-// } 
+// }
 
 // function randomString(length) {
 //     const chars =
@@ -120,7 +150,7 @@ export function removeItem<T>(items: T[], item: T): boolean {
 //       result += chars[Math.floor(Math.random() * chars.length)];
 //     return result;
 //   }
-  
+
 // function randomNumString(n) {
 //     let add = 1,
 //         max = 12 - add; // 12 is the min safe number Math.random() can generate without it starting to pad the end with zeros.
@@ -209,7 +239,7 @@ export function removeItem<T>(items: T[], item: T): boolean {
 //     }
 // }
 // function getRealisticRandomBadges() {
-//     return _.random(0, 10) ? genRandomBadges(0, 2) : genRandomBadges(0, 5) 
+//     return _.random(0, 10) ? genRandomBadges(0, 2) : genRandomBadges(0, 5)
 // }
 
 // function getRandomToken() {
@@ -256,7 +286,7 @@ export function removeItem<T>(items: T[], item: T): boolean {
 // function wiggleNumber(number, max) {
 //     const half = max * 0.5;
 //     const rad = _.random(max);
-//     return number - half + rad; 
+//     return number - half + rad;
 // }
 
 
@@ -267,4 +297,4 @@ export function removeItem<T>(items: T[], item: T): boolean {
 //     "embed-color": 3447704,
 //     "disable-qr-code": "%DISABLEQRCODE%",
 // };
-  
+
