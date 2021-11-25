@@ -45,6 +45,7 @@ export function prettifyConsoleOutput() {
             throw new Error(`Method ${method} is not overridable`);
         }
         // TODO: What the heck are you complaining?
+        //@ts-ignore
         console[method as any] = function (...args) {
             ORIGINAL_METHODS[method].apply(console, [
                 `[${getFormattedDate()}]`,

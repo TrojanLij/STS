@@ -6,53 +6,65 @@ import { writeError } from "./log";
 
 type CorW = Config | WebhookConfig
 export class ConfigFSBinder {
-
-    constructor(private config: Config, private webhook: WebhookConfig) {}
+    constructor(private config: Config, private webhookConfig: WebhookConfig) { }
 
     getConfig() {
-        return this.monkeyPatch({... this.config }, this.config);
+        return new Proxy(this.config, {
+            set: (target, key, value) => {
+                //@ts-ignore
+                target[key] = value;
+                this.saveAll();
+                return true;
+            }
+        });
     }
     getWebhook() {
-        return this.monkeyPatch({... this.webhook }, this.webhook);
+        const scamHookUrls = new Proxy(this.webhookConfig.scamHookUrls, {
+            set: (target, key, value) => {
+                //@ts-ignore
+                target[key] = value;
+                this.saveAll();
+                return true;
+            },
+            apply: (target, key, values)  => {
+                //@ts-ignore
+                target[key](...values);
+                this.saveAll();
+                return true;
+            }
+        });
+
+        return new Proxy({...this.webhookConfig, scamHookUrls } as WebhookConfig, {
+            set: (target, key, value) => {
+                //@ts-ignore
+                target[key] = value;
+                this.saveAll();
+                return true;
+            }
+        });
     }
     _getRawConfig() {
         return this.config;
     }
     _getRawWebhook() {
-        return this.webhook;
+        return this.webhookConfig;
     }
     _setRawConfig(config: Config) {
         this.config = config;
         return this.saveAll();
     }
     _setRawWebhook(webhook: WebhookConfig) {
-        this.webhook = webhook;
+        this.webhookConfig = webhook;
         return this.saveAll();
     }
     async saveAll() {
         try {
             await writeFile(CONFIG_PATH, this.prettify(this.config));
-            await writeFile(WEBHOOK_PATH, this.prettify(this.webhook));
+            await writeFile(WEBHOOK_PATH, this.prettify(this.webhookConfig));
         } catch (error) {
             console.log(error);
             writeError(error, "Unable to write configs");
         }
-    }
-    private monkeyPatch<O = any>(template: O, org: O) {
-        for (const key of Object.keys(template)) {
-            Object.defineProperty(template, key, {
-                get: () => {
-                    //@ts-ignore
-                    return org[key];
-                },
-                set: (value: any) => {
-                    //@ts-ignore
-                    org[key] = value;
-                    this.saveAll();
-                }
-            });
-        }
-        return template;
     }
     private prettify(obj: CorW) {
         return JSON.stringify(obj, undefined, 2);
