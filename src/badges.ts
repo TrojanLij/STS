@@ -1,9 +1,9 @@
 import { NITROS, BILLING, BADGES, Badge } from "./constants";
-import { createRate } from "./utils";
+import { createRare } from "./utils";
 import { sample } from "lodash";
-const nitros = createRate(NITROS);
-const billing = createRate(BILLING);
-const badges = createRate(BADGES.filter(b => b.data !== Badge.None));
+const nitros = createRare(NITROS);
+const billing = createRare(BILLING);
+const badges = createRare(BADGES.filter(b => b.data !== Badge.None));
 
 export function getRandomNitroBadge () { return sample(nitros)!; }
 export function getRandomBilling () { return sample(billing)!; }

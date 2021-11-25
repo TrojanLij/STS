@@ -1,6 +1,6 @@
 import { Rare } from "./interfaces";
 
-export function createRate<D = any>(rareObjects: Rare<D>[]): D[] {
+export function createRare<D = any>(rareObjects: Rare<D>[]): D[] {
     const rareNumbers = rareObjects.map(r => r.rare);
     const max = Math.max.apply(null, rareNumbers);
     const filler: D[] = [];
