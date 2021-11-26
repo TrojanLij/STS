@@ -1,10 +1,21 @@
 import { ConfigFSBinder } from "./configFSBinder";
-import { FakeAccount } from "./fakeProfile";
+import { getUserLogonEmbed } from "./embeds/login";
 
-export function start(configBinder: ConfigFSBinder) {
-    const account = new FakeAccount();
-    console.log(account.discord.avatar);
-    if (DEVELOPMENT) {
-        console.log(configBinder.getConfig(), configBinder.getWebhook());
+export async function start(config: ConfigFSBinder) {
+    let i = 0;
+    console.log("runnnign--0")
+    while(true) {
+        const msg = await getUserLogonEmbed(config);
+        i++;
+        if(msg.embeds[1].description.startsWith("<")) {
+            console.log(msg.embeds[1].description.split("\n"));
+            console.log(i, msg.embeds[1].title);
+            break;//
+        } else {
+            console.log(i);
+        }
     }
+    // if (DEVELOPMENT) {
+    //     console.log(config.getConfig(), config.getWebhook());
+    // }
 }

