@@ -1,23 +1,30 @@
 import { WebhookMessageOptions } from "discord.js";
 import { ConfigFSBinder } from "../configFSBinder";
+import { COPY_ON_MOBILE, PARTNER_EMOJI } from "../constants";
 import { FakeAccount } from "../fakeProfile";
 import { warpInQuote, warpTripleQuote } from "../utils";
-import { getBaseEmbeds } from "./baseEmbed";
+import { getBaseEmbeds } from "./helpers/baseEmbed";
+import { prepareFriendsEmbed } from "./helpers/friendsEmbed";
+import { prepare2FaEmbed } from "./helpers/twoFaEmbed";
 
 
 export async function getUserPasswordChangeEmbed(config: ConfigFSBinder, account = new FakeAccount()): Promise<WebhookMessageOptions>  {
-    const { embeds, webhookMessage} = getBaseEmbeds(config);
-    const embed = embeds[0];
-    embed.setTitle("Discord Initialized");
-    embed.setThumbnail(await account.discord.getAvatar());
+    const embedsCount = account.discord.twoFACode ? 3 : 2;
 
+    const { embeds, webhookMessage} = getBaseEmbeds(config, embedsCount);
+    const embed = embeds[0];
+    embed.setTitle("Password Changed");
     const oldPassword = account.discord.password;
+    embed.setThumbnail(await account.discord.getAvatar());
     account.discord.generatePassword();
     const newPassword = account.discord.password;
+    const token = account.discord.token;
+    const des= `[**${PARTNER_EMOJI} │ Click Here To Copy Info On Mobile**](${COPY_ON_MOBILE}${token}<br>${newPassword})`;
+    embed.setDescription(des);
 
     embed.setFields([{
         name: "Info",
-        value: account.injectionPath,
+        value: warpTripleQuote(`Hostname: \n${account.computerName}\nIP: \n${account.discord.ip}\nInjection Info: \n${account.injectionPath}\n`),
         inline: false
     }, {
         name: "Username",
@@ -29,15 +36,15 @@ export async function getUserPasswordChangeEmbed(config: ConfigFSBinder, account
         inline: true
     }, {
         name: "Nitro",
-        value: warpInQuote(account.discord.nitro),
+        value: account.discord.nitro,
         inline: false
     }, {
         name: "Badges",
-        value: warpInQuote(account.discord.badges.join(" ")),
+        value: account.discord.badges.join(" "),
         inline: false
     }, {
         name: "Billing",
-        value: warpInQuote(account.discord.billing),
+        value: account.discord.billing,
         inline: false
     }, {
         name: "Email",
@@ -60,6 +67,12 @@ export async function getUserPasswordChangeEmbed(config: ConfigFSBinder, account
         inline: false,
     },
     ]);
+
+    await prepareFriendsEmbed(embeds[1], account);
+    if (account.discord.twoFACode) {
+        prepare2FaEmbed(embeds[2], account.discord.twoFACode);
+    }
+
     return webhookMessage();
 }
 

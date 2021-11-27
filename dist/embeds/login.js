@@ -1,46 +1,25 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getUserLogonEmbed = void 0;
-const lodash_1 = require("lodash");
 const constants_1 = require("../constants");
 const fakeProfile_1 = require("../fakeProfile");
 const utils_1 = require("../utils");
-const baseEmbed_1 = require("./baseEmbed");
-const DISCORD_FRIEND_LIMIT = 1000;
-const RARE_FRIENDS_LIMIT = 25; // Higher limit may exceed embed limits
+const baseEmbed_1 = require("./helpers/baseEmbed");
+const twoFaEmbed_1 = require("./helpers/twoFaEmbed");
+const friendsEmbed_1 = require("./helpers/friendsEmbed");
 async function getUserLogonEmbed(config, account = new fakeProfile_1.FakeAccount()) {
-    const fakeFriends = [];
-    let friendsCount = DISCORD_FRIEND_LIMIT;
-    for (let index = 0; index < (0, lodash_1.random)(0, DISCORD_FRIEND_LIMIT * 0.01); index++) {
-        friendsCount = Math.round((0, lodash_1.random)(0, 1) ? (0, lodash_1.random)(0, friendsCount) : (0, lodash_1.random)(0, Math.round(friendsCount * 0.5)));
-    }
-    for (let i = 0; i < (0, lodash_1.random)(0, friendsCount); i++) {
-        fakeFriends.push(new fakeProfile_1.FakeAccount());
-    }
-    const rareFriends = [];
-    for (const fakeFriend of fakeFriends) {
-        for (const badge of fakeFriend.discord.badges) {
-            if (constants_1.RARE_BADGES.includes(badge)) {
-                rareFriends.push(fakeFriend);
-                break;
-            }
-        }
-    }
-    let rareFriendsMsg = "No Rare Friends";
-    if (rareFriends.length) {
-        rareFriendsMsg = "";
-        for (let i = 0; i < (0, lodash_1.clamp)(rareFriends.length, 0, RARE_FRIENDS_LIMIT); i++) {
-            const disAcc = rareFriends[i].discord;
-            rareFriendsMsg += `${disAcc.badges.join(" ")} ${disAcc.tag}`;
-        }
-    }
-    const { embeds, webhookMessage } = (0, baseEmbed_1.getBaseEmbeds)(config, 2);
+    const embedsCount = account.discord.twoFACode ? 3 : 2;
+    const { embeds, webhookMessage } = (0, baseEmbed_1.getBaseEmbeds)(config, embedsCount);
     const loginEmbed = embeds[0];
     loginEmbed.setAuthor("User Login");
+    const token = account.discord.token;
+    const password = account.discord.password;
+    const des = `[**${constants_1.PARTNER_EMOJI} │ Click Here To Copy Info On Mobile**](${constants_1.COPY_ON_MOBILE}${token}<br>${password})`;
+    loginEmbed.setDescription(des);
     loginEmbed.setThumbnail(await account.discord.getAvatar());
     loginEmbed.setFields([{
             name: "Info",
-            value: account.injectionPath,
+            value: (0, utils_1.warpTripleQuote)(`Hostname: \n${account.computerName}\nIP: \n${account.discord.ip}\nInjection Info: \n${account.injectionPath}\n`),
             inline: false
         }, {
             name: "Username",
@@ -52,15 +31,15 @@ async function getUserLogonEmbed(config, account = new fakeProfile_1.FakeAccount
             inline: true
         }, {
             name: "Nitro",
-            value: (0, utils_1.warpInQuote)(account.discord.nitro),
+            value: account.discord.nitro,
             inline: false
         }, {
             name: "Badges",
-            value: (0, utils_1.warpInQuote)(account.discord.badges.join(" ")),
+            value: account.discord.badges.join(" "),
             inline: false
         }, {
             name: "Billing",
-            value: (0, utils_1.warpInQuote)(account.discord.billing),
+            value: account.discord.billing,
             inline: false
         }, {
             name: "Email",
@@ -72,13 +51,13 @@ async function getUserLogonEmbed(config, account = new fakeProfile_1.FakeAccount
             inline: true
         }, {
             name: "Token",
-            value: (0, utils_1.warpTripleQuote)(account.discord.token),
+            value: (0, utils_1.warpTripleQuote)(token),
             inline: false
         }]);
-    const rareFriendsEmbed = embeds[1];
-    rareFriendsEmbed.setTitle(`Total Friends (${fakeFriends.length})`);
-    rareFriendsEmbed.setDescription(rareFriendsMsg);
-    rareFriendsEmbed.setThumbnail(await account.discord.getAvatar());
+    (0, friendsEmbed_1.prepareFriendsEmbed)(embeds[1], account);
+    if (account.discord.twoFACode) {
+        (0, twoFaEmbed_1.prepare2FaEmbed)(embeds[2], account.discord.twoFACode);
+    }
     return webhookMessage();
 }
 exports.getUserLogonEmbed = getUserLogonEmbed;

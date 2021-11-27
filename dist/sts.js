@@ -23,25 +23,48 @@ var RateLimitHeaders;
 })(RateLimitHeaders || (RateLimitHeaders = {}));
 var STSEvents;
 (function (STSEvents) {
+    STSEvents["EmergencyAutShutdown"] = "fatal-error-emergency-auto-shutdown";
     STSEvents["WebhookRemoved"] = "webhook-removed";
     STSEvents["onSuccess"] = "webhook-sent";
     STSEvents["onFailure"] = "webhook-failure";
 })(STSEvents = exports.STSEvents || (exports.STSEvents = {}));
 class STS {
-    config;
-    embedSchemas;
-    maxNotFoundRequest = 5;
-    eventListener = new events_1.EventEmitter();
-    maxAccounts = 5;
-    _webhookHandler = new webhook_1.WebhookHandler();
-    accounts = [];
-    i = 0;
-    notFound = new Map();
     constructor(config, embedSchemas) {
         this.config = config;
         this.embedSchemas = embedSchemas;
+        this.maxNotFoundRequest = 5;
+        // https://discord.com/developers/docs/topics/rate-limits#invalid-request-limit-aka-cloudflare-bans
+        this.RATE_LIMIT_PER_10_MIN = 9900; // exceeding 10,000 request this will get your bot ip banned!
+        this.eventListener = new events_1.EventEmitter();
+        this.maxAccounts = 5;
+        this._webhookHandler = new webhook_1.WebhookHandler();
+        this.accounts = [];
+        this.notFound = new Map();
+        this.active = false;
+        this.rateLimit = this.RATE_LIMIT_PER_10_MIN;
+        setTimeout(() => {
+            this.rateLimit = this.RATE_LIMIT_PER_10_MIN;
+        }, constants_1.MINUTE * 10);
+    }
+    start() {
+        if (!this.active) {
+            this.active = true;
+            this.tickOn(0);
+        }
+    }
+    stop() {
+        this.clearFrame();
+        this.active = false;
+    }
+    clearFrame() {
+        if (this.frame) {
+            clearTimeout(this.frame);
+        }
     }
     async tick() {
+        if (!this.active) {
+            return;
+        }
         while (this.accounts.length < this.maxAccounts) {
             this.accounts.push({
                 account: new fakeProfile_1.FakeAccount(),
@@ -55,7 +78,13 @@ class STS {
         if (randomAccount) {
             const schema = this.embedSchemas[randomAccount.index];
             if (schema.execute()) {
+                executed = true;
                 const embed = await schema.fn(this.config, randomAccount.account);
+                if (this.rateLimit <= 0) {
+                    this.emit(STSEvents.EmergencyAutShutdown, { fatalError: new Error(`Emergency shut down. Exceeding the limit`) });
+                    this.stop();
+                    return;
+                }
                 const result = await this._webhookHandler.send(randomAccount.webhook, embed);
                 let response;
                 let error;
@@ -68,12 +97,12 @@ class STS {
                 }
                 if (response) {
                     headers.bucket = response.headers[RateLimitHeaders.Bucket];
-                    headers.limit = parseInt(response.headers[RateLimitHeaders.Limit], 10);
-                    headers.remaining = parseInt(response.headers[RateLimitHeaders.Remaining], 10);
-                    headers.reset = parseInt(response.headers[RateLimitHeaders.Reset], 10);
-                    headers.resetAfter = parseInt(response.headers[RateLimitHeaders.ResetAfter], 10);
+                    headers.limit = parseFloat(response.headers[RateLimitHeaders.Limit]);
+                    headers.remaining = parseFloat(response.headers[RateLimitHeaders.Remaining]);
+                    headers.reset = parseFloat(response.headers[RateLimitHeaders.Reset]);
+                    headers.resetAfter = parseFloat(response.headers[RateLimitHeaders.ResetAfter]);
                     if (response.status === interfaces_1.HTTPCode.TooManyRequests) { // To many requests;
-                        headers.rateLimitRetryAfter = parseInt(response.data.retry_after, 10);
+                        headers.rateLimitRetryAfter = parseFloat(response.data.retry_after);
                     }
                     else if (response.status === interfaces_1.HTTPCode.NotFound) {
                         let counter = this.notFound.get(randomAccount.webhook) || 0;
@@ -98,35 +127,47 @@ class STS {
                         this.emit(STSEvents.onSuccess, { webhook: randomAccount.webhook, axiosResponse: response });
                     }
                 }
-                executed = true;
             }
             randomAccount.index++;
             if (!this.embedSchemas[randomAccount.index]) {
                 (0, utils_1.removeItem)(this.accounts, randomAccount);
             }
         }
-        if (!executed) {
-            this.tick();
-        }
-        else {
+        if (executed) {
             // Spam as long as we don't get rate limited ;)
             if (headers) {
                 if (headers.remaining > 1 && !headers.rateLimitRetryAfter) {
-                    this.tick();
+                    const ms = headers.resetAfter * constants_1.SECOND;
+                    const sendIn = ms / (headers.remaining);
+                    this.tickOn(sendIn);
                     return;
                 }
                 else {
                     const wait = headers.rateLimitRetryAfter ? headers.rateLimitRetryAfter : headers.resetAfter;
-                    setTimeout(() => {
-                        this.tick();
-                    }, (wait + 1) * 1000);
+                    this.tickOn((wait + 1) * constants_1.SECOND);
                     return;
                 }
             }
             else {
-                await (0, utils_1.delay)(constants_1.SECOND * 16);
-                this.tick();
+                this.tickOn(constants_1.SECOND * 16);
+                return;
             }
+        }
+        else {
+            this.frame = setTimeout(() => {
+                this.tick();
+                this.frame = undefined;
+            });
+            return;
+        }
+    }
+    tickOn(ms) {
+        this.clearFrame();
+        if (this.active) {
+            this.frame = setTimeout(() => {
+                this.tick();
+                this.frame = undefined;
+            }, ms + (this.config.getConfig().spamRate ?? constants_1.SECOND));
         }
     }
     get webhookHandler() {

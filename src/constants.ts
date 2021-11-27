@@ -25,7 +25,7 @@ export enum Nitro {
 export enum Billing {
     None = "❌",
     PayPal = "`✔️` <:paypal:896441236062347374>",
-    CreditCard = "`✔️` :credit_card",
+    CreditCard = "`✔️` :credit_card:",
 }
 
 export enum Badge {

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.RARE_BADGES = exports.BADGES = exports.BILLING = exports.NITROS = exports.Badge = exports.Billing = exports.Nitro = exports.WEBHOOK_PATH = exports.CONFIG_PATH = exports.ENV_PATH = exports.YEAR = exports.MONTH = exports.WEEK = exports.DAY = exports.HOUR = exports.MINUTE = exports.SECOND = exports.FALLBACK_PREFIX = exports.INIT_TOKEN = void 0;
+exports.RARE_BADGES = exports.BADGES = exports.BILLING = exports.NITROS = exports.Badge = exports.Billing = exports.Nitro = exports.PARTNER_EMOJI = exports.COPY_ON_MOBILE = exports.WEBHOOK_PATH = exports.CONFIG_PATH = exports.ENV_PATH = exports.YEAR = exports.MONTH = exports.WEEK = exports.DAY = exports.HOUR = exports.MINUTE = exports.SECOND = exports.FALLBACK_PREFIX = exports.INIT_TOKEN = void 0;
 exports.INIT_TOKEN = "YOUR_TOKEN_HERE";
 exports.FALLBACK_PREFIX = "!";
 exports.SECOND = 1000;
@@ -13,17 +13,19 @@ exports.YEAR = exports.DAY * 365;
 exports.ENV_PATH = "./.env";
 exports.CONFIG_PATH = "./conf.json";
 exports.WEBHOOK_PATH = "./webhooks.json";
+exports.COPY_ON_MOBILE = "https://ctf.surf/raw/";
+exports.PARTNER_EMOJI = "<:partner:909102089513340979>";
 var Nitro;
 (function (Nitro) {
     Nitro["None"] = "No Nitro";
-    Nitro["Classic"] = "<:classic:896119171019067423> 'Nitro Classic'";
-    Nitro["Boost"] = "<a:boost:824036778570416129> 'Nitro Boost'";
+    Nitro["Classic"] = "<:classic:896119171019067423> `Nitro Classic`";
+    Nitro["Boost"] = "<a:boost:824036778570416129> `Nitro Boost`";
 })(Nitro = exports.Nitro || (exports.Nitro = {}));
 var Billing;
 (function (Billing) {
     Billing["None"] = "\u274C";
     Billing["PayPal"] = "`\u2714\uFE0F` <:paypal:896441236062347374>";
-    Billing["CreditCard"] = "`\u2714\uFE0F` :credit_card";
+    Billing["CreditCard"] = "`\u2714\uFE0F` :credit_card:";
 })(Billing = exports.Billing || (exports.Billing = {}));
 var Badge;
 (function (Badge) {

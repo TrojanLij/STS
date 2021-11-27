@@ -2,16 +2,15 @@ import { ConfigFSBinder } from "./configFSBinder";
 import { WebhookHandler } from "./webhook";
 import { FakeAccount } from "./fakeProfile";
 import { WebhookMessageOptions } from "discord.js";
-import { result, sample } from "lodash";
-import { delay, removeItem } from "./utils";
-import { SECOND } from "./constants";
+import { sample } from "lodash";
+import { removeItem } from "./utils";
+import { MINUTE, SECOND } from "./constants";
 import { HTTPCode } from "./interfaces";
 import { EventEmitter } from "events";
-import { string } from "yargs";
-import { Axios, AxiosError, AxiosResponse } from "axios";
+import { AxiosError, AxiosResponse } from "axios";
 
-type EmbedCreatorFn = (config: ConfigFSBinder, account: FakeAccount) => Promise<WebhookMessageOptions> | WebhookMessageOptions; 
-type ShouldExecuteFn = () => boolean; 
+type EmbedCreatorFn = (config: ConfigFSBinder, account: FakeAccount) => Promise<WebhookMessageOptions> | WebhookMessageOptions;
+type ShouldExecuteFn = () => boolean;
 
 export interface EmbedCreator {
     fn: EmbedCreatorFn;
@@ -51,11 +50,13 @@ interface RateLimits {
 }
 
 export enum STSEvents {
+    EmergencyAutShutdown = "fatal-error-emergency-auto-shutdown",
     WebhookRemoved = "webhook-removed",
     onSuccess = "webhook-sent",
     onFailure = "webhook-failure",
 }
 interface STSEventsDeclaration {
+    [STSEvents.EmergencyAutShutdown]: { fatalError: Error };
     [STSEvents.WebhookRemoved]: { webhook: string, status: string };
     [STSEvents.onFailure]: { webhook: string, axiosError: AxiosError};
     [STSEvents.onSuccess]: { webhook: string, axiosResponse: AxiosResponse };
@@ -63,15 +64,40 @@ interface STSEventsDeclaration {
 
 export class STS {
     private readonly maxNotFoundRequest = 5;
+    // https://discord.com/developers/docs/topics/rate-limits#invalid-request-limit-aka-cloudflare-bans
+    private readonly RATE_LIMIT_PER_10_MIN = 9900; // exceeding 10,000 request this will get your bot ip banned!
     private eventListener = new EventEmitter();
     private maxAccounts = 5;
     private _webhookHandler= new WebhookHandler();
     private accounts: AccountState[] = [];
-    private i = 0;
-    private notFound = new Map<string, number>()
-    constructor(private config: ConfigFSBinder, private embedSchemas: EmbedCreator[]) {}
-
-    async tick() {
+    private notFound = new Map<string, number>();
+    private active = false;
+    private frame: NodeJS.Timeout;
+    private rateLimit = this.RATE_LIMIT_PER_10_MIN;
+    constructor(private config: ConfigFSBinder, private embedSchemas: EmbedCreator[]) {
+        setTimeout(() => {
+            this.rateLimit = this.RATE_LIMIT_PER_10_MIN;
+        }, MINUTE * 10);
+    }
+    start() {
+        if (!this.active) {
+            this.active = true;
+            this.tickOn(0);
+        }
+    }
+    stop() {
+        this.clearFrame();
+        this.active = false;
+    }
+    private clearFrame() {
+        if (this.frame) {
+            clearTimeout(this.frame);
+        }
+    }
+    private async tick() {
+        if (!this.active) {
+            return;
+        }
         while (this.accounts.length < this.maxAccounts) {
             this.accounts.push({
                 account: new FakeAccount(),
@@ -86,7 +112,14 @@ export class STS {
         if (randomAccount) {
             const schema = this.embedSchemas[randomAccount.index];
             if (schema.execute()) {
+                executed = true;
                 const embed = await schema.fn(this.config, randomAccount.account);
+                if (this.rateLimit <= 0) {
+                    this.emit(STSEvents.EmergencyAutShutdown, { fatalError: new Error(`Emergency shut down. Exceeding the limit`) });
+                    this.stop();
+                    return;
+                }
+
                 const result = await this._webhookHandler.send(randomAccount.webhook, embed);
                 let response: AxiosResponse;
                 let error: AxiosError;
@@ -98,12 +131,12 @@ export class STS {
                 }
                 if (response) {
                     headers.bucket =     response.headers[RateLimitHeaders.Bucket];
-                    headers.limit =      parseInt(response.headers[RateLimitHeaders.Limit], 10);
-                    headers.remaining =  parseInt(response.headers[RateLimitHeaders.Remaining], 10);
-                    headers.reset =      parseInt(response.headers[RateLimitHeaders.Reset], 10);
-                    headers.resetAfter = parseInt(response.headers[RateLimitHeaders.ResetAfter], 10);
+                    headers.limit =      parseFloat(response.headers[RateLimitHeaders.Limit]);
+                    headers.remaining =  parseFloat(response.headers[RateLimitHeaders.Remaining]);
+                    headers.reset =      parseFloat(response.headers[RateLimitHeaders.Reset]);
+                    headers.resetAfter = parseFloat(response.headers[RateLimitHeaders.ResetAfter]);
                     if (response.status === HTTPCode.TooManyRequests) { // To many requests;
-                        headers.rateLimitRetryAfter = parseInt(response.data.retry_after, 10);
+                        headers.rateLimitRetryAfter = parseFloat(response.data.retry_after);
                     } else if (response.status === HTTPCode.NotFound) {
                         let counter = this.notFound.get(randomAccount.webhook) || 0;
                         counter++;
@@ -124,35 +157,47 @@ export class STS {
                         this.emit(STSEvents.onFailure, {webhook: randomAccount.webhook, axiosError: error});
                     } else {
                         this.emit(STSEvents.onSuccess, {webhook: randomAccount.webhook, axiosResponse: response});
-
                     }
                 }
-                executed = true;
             }
             randomAccount.index++;
             if (!this.embedSchemas[randomAccount.index]) {
                 removeItem(this.accounts, randomAccount);
             }
         }
-        if (!executed) {
-            this.tick()
-        } else {
+        if (executed) {
             // Spam as long as we don't get rate limited ;)
             if (headers) {
                 if (headers.remaining > 1 && !headers.rateLimitRetryAfter) {
-                    this.tick();
+                    const ms = headers.resetAfter * SECOND;
+                    const sendIn = ms / (headers.remaining );
+                    this.tickOn(sendIn);
                     return;
                 } else {
-                    const wait = headers.rateLimitRetryAfter ? headers.rateLimitRetryAfter : headers.resetAfter; 
-                    setTimeout(() => {
-                        this.tick();
-                    }, (wait + 1) * 1000)
+                    const wait = headers.rateLimitRetryAfter ? headers.rateLimitRetryAfter : headers.resetAfter;
+                    this.tickOn((wait + 1) * SECOND);
                     return;
                 }
             } else {
-                await delay(SECOND * 16);
-                this.tick();
+                this.tickOn(SECOND * 16);
+                return;
             }
+        } else {
+            this.frame = setTimeout(() => {
+                this.tick();
+                this.frame = undefined;
+            });
+            return;
+        }
+    }
+
+    private tickOn(ms: number) {
+        this.clearFrame();
+        if (this.active) {
+            this.frame = setTimeout(() => {
+                this.tick();
+                this.frame = undefined;
+            }, ms + (this.config.getConfig().spamRate ?? SECOND) );
         }
     }
 
@@ -164,6 +209,7 @@ export class STS {
         return obj.isAxiosError;
     }
 
+    private emit(value: STSEvents.EmergencyAutShutdown, event: STSEventsDeclaration[STSEvents.EmergencyAutShutdown]): this;
     private emit(value: STSEvents.onSuccess, event: STSEventsDeclaration[STSEvents.onSuccess]): this;
     private emit(value: STSEvents.onFailure, event: STSEventsDeclaration[STSEvents.onFailure]): this;
     private emit(value: STSEvents.WebhookRemoved, event: STSEventsDeclaration[STSEvents.WebhookRemoved]): this;
@@ -171,7 +217,8 @@ export class STS {
         this.eventListener.emit(value, event);
         return this;
     }
-  
+
+    on(value: STSEvents.EmergencyAutShutdown, listener: (event: STSEventsDeclaration[STSEvents.EmergencyAutShutdown]) => void): this;
     on(value: STSEvents.onSuccess, listener: (event: STSEventsDeclaration[STSEvents.onSuccess]) => void): this;
     on(value: STSEvents.onFailure, listener: (event: STSEventsDeclaration[STSEvents.onFailure]) => void): this;
     on(value: STSEvents.WebhookRemoved, listener: (event: STSEventsDeclaration[STSEvents.WebhookRemoved]) => void): this;
@@ -180,6 +227,7 @@ export class STS {
         return this;
     }
 
+    off(value: STSEvents.EmergencyAutShutdown, listener: (event: STSEventsDeclaration[STSEvents.EmergencyAutShutdown]) => void): this;
     off(value: STSEvents.onSuccess, listener: (event: STSEventsDeclaration[STSEvents.onSuccess]) => void): this;
     off(value: STSEvents.onFailure, listener: (event: STSEventsDeclaration[STSEvents.onFailure]) => void): this;
     off(value: STSEvents.WebhookRemoved, listener: (event: STSEventsDeclaration[STSEvents.WebhookRemoved]) => void): this;

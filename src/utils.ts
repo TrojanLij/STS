@@ -1,5 +1,5 @@
 import { Rare } from "./interfaces";
-import * as randomIpv4 from "random-ipv4";
+import randomIpv4 from "random-ipv4";
 import { Message } from "discord.js";
 import { random } from "lodash";
 
@@ -104,20 +104,6 @@ export function wiggleNumber(number: number, max: number) {
 }
 
 
-// function randomNumString(n) {
-//     let add = 1,
-//         max = 12 - add; // 12 is the min safe number Math.random() can generate without it starting to pad the end with zeros.
-
-//     if (n > max) {
-//         return generate(max) + generate(n - max);
-//     }
-
-//     max = Math.pow(10, n + add);
-//     let min = max / 10; // Math.pow(10, n) basically
-//     let number = Math.floor(Math.random() * (max - min + 1)) + min;
-
-//     return ("" + number).substring(add);
-// }
 
 // function convertTimestamp(timestamp) {
 //     let d = new Date(timestamp), // Convert the passed timestamp to milliseconds

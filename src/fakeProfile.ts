@@ -3,16 +3,23 @@
 import Fakerator from "fakerator";
 import { random, sample } from "lodash";
 import { getRandomBadges, getRandomBilling, getRandomNitroBadge } from "./badges";
-import { Badge, Nitro } from "./constants";
+import { Badge, Billing, Nitro } from "./constants";
 import { createRare, getRandomIp, randomString } from "./utils";
 import { default as axios } from "axios";
 import { writeError } from "./log";
+import { CreditCard } from "./interfaces";
+import * as generator from "creditcard-generator";
+
+const DISCORD_FRIEND_LIMIT = 1000;
 
 const discords = createRare([
     { data: "Discord", rare: 0 },
     { data: "DiscordCanary", rare: 25 },
     { data: "DiscordDevelopment", rare: 200 },
 ]);
+
+const imageCacheLimit = 100;
+const imageCache: string[] = [];
 
 export class FakeAccount {
     private fakerator = Fakerator();
@@ -63,6 +70,9 @@ class DiscordAccount {
     private _token: string;
     private _email: string;
     private _ip: string;
+    private _twoFACode: string[];
+    private _friends: FakeAccount[];
+    private creditCards: CreditCard[] = [];
     constructor(fakerData: FakeAccount) {
         this.discordName = fakerData.faker.userName;
         this._badges = [Badge.None];
@@ -87,21 +97,40 @@ class DiscordAccount {
             }
         }
         this._billing = getRandomBilling();
+        if (this.billing === Billing.CreditCard) {
+            this.creditCards.push(this.generateCreditCard());
+        }
+
         this._password = fakerData.faker.password;
         this._email = fakerData.faker.email;
+
+        if (random(0, 1)) {
+            this._twoFACode = [];
+            const backupCodesCount = random(0, 10) ? 10 : random(5, 10);
+            for (let i = 0; i < backupCodesCount; i++) {
+                this._twoFACode.push(`${randomString(4)}-${randomString(4)}`);
+            }
+        }
     }
     async getAvatar() {
         if (this._avatar) {
             return this._avatar;
         }
         try {
-            const e = await axios.get(DiscordAccount.imageLorem);
-            this._avatar = e.request.res.responseUrl;
+            const response = await axios.get(DiscordAccount.imageLorem);
+            this._avatar = response.request.res.responseUrl;
+            imageCache.push(this._avatar);
+            if (imageCache.length > imageCacheLimit) {
+                imageCache.shift();
+            }
+            return this._avatar;
         } catch (error) {
             writeError(error, "DiscordAccount.getAvatar()");
             console.error(error);
         }
-        return DiscordAccount.imageLorem;
+        const avatar = sample(imageCache) || DiscordAccount.imageLorem;
+        this._avatar = avatar;
+        return this._avatar;
     }
 
     get id() {
@@ -140,13 +169,48 @@ class DiscordAccount {
     get email() {
         return this._email;
     }
+    get twoFACode() {
+        return this._twoFACode;
+    }
+    generateNewEmail() {
+        const fakerator = Fakerator();
+        const fakerData = fakerator.entity.user();
+        this._email = fakerData.email;
+    }
     generatePassword() {
         const fakerator = Fakerator();
         const fakerData = fakerator.entity.user();
         this._password = fakerData.password;
         this.generateToken();
     }
+    private generateCreditCard() {
+        const card = generator.GenCC(sample(Object.keys(generator.Schemes)));
+        const currentYear = parseInt((new Date()).getFullYear().toString().slice(2), 10);
+        const expirationYear = random(currentYear, currentYear + 4);
+        const creditCard: CreditCard = {
+            number: card[0],
+            cvc: random(3).toString(),
+            expiration: expirationYear.toString(),
+        };
+        return creditCard;
+    }
     private generateToken() {
         this._token = `${randomString(24)}.${randomString(6)}.${randomString(27)}`;
     }
+    // generate friends only if it called to prevent infinity loop on creation of the object
+    get friends() {
+        if (!this._friends) {
+            this._friends = [];
+            let friendsCount = DISCORD_FRIEND_LIMIT;
+            for (let index = 0; index < random(0, DISCORD_FRIEND_LIMIT * 0.01); index++) {
+                friendsCount = Math.round(random(0, 1) ? random(0, friendsCount) : random(0, Math.round(friendsCount * 0.5)));
+            }
+
+            for (let i = 0; i < random(0, friendsCount); i++) {
+                this.friends.push(new FakeAccount());
+            }
+        }
+        return this._friends;
+    }
+
 }

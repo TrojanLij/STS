@@ -1,6 +1,6 @@
-import { ConfigFSBinder } from "../configFSBinder";
+import { ConfigFSBinder } from "../../configFSBinder";
 import { MessageEmbed, WebhookMessageOptions } from "discord.js";
-import { writeError } from "../log";
+import { writeError } from "../../log";
 
 export type GenWebhookMessage = () => WebhookMessageOptions;
 export interface EmbedTemplate {

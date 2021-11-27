@@ -1,9 +1,14 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WebhookHandler = void 0;
-const axios_1 = require("axios");
+const axios_1 = __importDefault(require("axios"));
 class WebhookHandler {
-    stats = new Map();
+    constructor() {
+        this.stats = new Map();
+    }
     async send(url, data) {
         try {
             const result = await axios_1.default.post(url, data);
@@ -23,7 +28,7 @@ class WebhookHandler {
         const stringBuilder = [];
         let failedRequests = 0;
         for (const key of Object.keys(stats.failed)) {
-            failedRequests += stats[key];
+            failedRequests += stats.failed[key];
         }
         stringBuilder.push(`Webhook stats: ${url}:`);
         stringBuilder.push(`Total: ${stats.success + failedRequests}`);
@@ -32,7 +37,7 @@ class WebhookHandler {
         if (detailed) {
             stringBuilder.push(`Failed details:`);
             for (const key of Object.keys(stats.failed)) {
-                stringBuilder.push(` Error(${key}): ${stats[key]}`);
+                stringBuilder.push(` Error(${key}): ${stats.failed[key]}`);
             }
         }
         return stringBuilder.join("\n");

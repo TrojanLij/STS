@@ -2,12 +2,11 @@ import { WebhookMessageOptions } from "discord.js";
 import axios, { AxiosError } from "axios";
 interface WebhookStats {
     success: number,
-    failed: {[key: number]: number};
+    failed: {[key: number | string]: number};
 }
 
 export class WebhookHandler {
     private stats = new Map<string, WebhookStats>();
-
     async send(url: string, data: WebhookMessageOptions) {
         try {
             const result = await axios.post(url, data);
@@ -20,13 +19,13 @@ export class WebhookHandler {
     }
     getWebhookStats(url: string, detailed = false ) {
         const stats = this.stats.get(url);
-        if (!stats) { 
+        if (!stats) {
             return "No stats";
         }
         const stringBuilder: string[] = [];
         let failedRequests = 0;
         for (const key of Object.keys(stats.failed)) {
-            failedRequests += stats[key];
+            failedRequests += stats.failed[key];
         }
 
         stringBuilder.push(`Webhook stats: ${url}:`);
@@ -37,7 +36,7 @@ export class WebhookHandler {
         if (detailed) {
             stringBuilder.push(`Failed details:`);
             for (const key of Object.keys(stats.failed)) {
-                stringBuilder.push(` Error(${key}): ${stats[key]}`);
+                stringBuilder.push(` Error(${key}): ${stats.failed[key]}`);
             }
         }
         return stringBuilder.join("\n");

@@ -1,7 +1,10 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.wiggleNumber = exports.delay = exports.warpInQuote = exports.warpTripleQuote = exports.quoteEscape = exports.getCommandArgs = exports.getArgsRaw = exports.isCommand = exports.getRandomIp = exports.randomString = exports.removeItem = exports.pushUniq = exports.createRare = void 0;
-const randomIpv4 = require("random-ipv4");
+const random_ipv4_1 = __importDefault(require("random-ipv4"));
 const lodash_1 = require("lodash");
 function createRare(rareObjects) {
     const rareNumbers = rareObjects.map(r => r.rare);
@@ -47,7 +50,7 @@ function randomString(length) {
 }
 exports.randomString = randomString;
 function getRandomIp() {
-    return randomIpv4("{token1}.{token2}.{token3}.{token4}", {
+    return (0, random_ipv4_1.default)("{token1}.{token2}.{token3}.{token4}", {
         token1: {
             min: 1,
             max: 254,
@@ -103,17 +106,6 @@ function wiggleNumber(number, max) {
     return number - half + rad;
 }
 exports.wiggleNumber = wiggleNumber;
-// function randomNumString(n) {
-//     let add = 1,
-//         max = 12 - add; // 12 is the min safe number Math.random() can generate without it starting to pad the end with zeros.
-//     if (n > max) {
-//         return generate(max) + generate(n - max);
-//     }
-//     max = Math.pow(10, n + add);
-//     let min = max / 10; // Math.pow(10, n) basically
-//     let number = Math.floor(Math.random() * (max - min + 1)) + min;
-//     return ("" + number).substring(add);
-// }
 // function convertTimestamp(timestamp) {
 //     let d = new Date(timestamp), // Convert the passed timestamp to milliseconds
 //         yyyy = d.getFullYear(),
