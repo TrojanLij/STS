@@ -1,6 +1,6 @@
 /// <reference path="typeFix/fakerator.d.ts"/>
 
-import * as Fakerator from "fakerator";
+import * as Fakerator  from "fakerator";
 import { random, sample } from "lodash";
 import { getRandomBadges, getRandomBilling, getRandomNitroBadge } from "./badges";
 import { Badge, Nitro } from "./constants";
@@ -50,16 +50,16 @@ class DiscordAccount {
     private _discordVersion = `app-10.0.190${random(10, 99)}`;
     // eslint-disable-next-line @typescript-eslint/no-loss-of-precision
     private _id = random(399999999999999999, 699999999999999999).toString();
-    private discordName: string;
     private _discriminator = random(1000, 9999).toString();
-    private _nitro: string;
+    private discordName: string;
+    private _password: string;
     private _billing: string;
     private _badges: string[];
-    private _token: string;
-    private _ip: string;
-    private _password: string;
     private _avatar: string;
+    private _nitro: string;
+    private _token: string;
     private _email: string;
+    private _ip: string;
     constructor(fakerData: FakeAccount) {
         this.discordName = fakerData.faker.userName;
         this._badges = [Badge.None];

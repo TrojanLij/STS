@@ -8,6 +8,7 @@
       "skipLibCheck": true ,
       "lib": ["DOM"],
       "outDir": "dist",
+      "esModuleInterop": false
     },
     "files": ["src/index.ts"]
   }
