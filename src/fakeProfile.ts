@@ -1,6 +1,6 @@
 /// <reference path="typeFix/fakerator.d.ts"/>
 
-import * as Fakerator  from "fakerator";
+import Fakerator from "fakerator";
 import { random, sample } from "lodash";
 import { getRandomBadges, getRandomBilling, getRandomNitroBadge } from "./badges";
 import { Badge, Nitro } from "./constants";
@@ -18,14 +18,14 @@ export class FakeAccount {
     private fakerator = Fakerator();
     private fakerData = this.fakerator.entity.user();
     private discordAccount: DiscordAccount;
-    private computerName: string;
+    private _computerName: string;
     private _injectionPath: string;
     constructor() {
         this.discordAccount = new DiscordAccount(this);
-        this.computerName = random(0, 10) ? `${this.faker.firstName} ${this.faker.lastName}` : this.faker.userName;
+        this._computerName = random(0, 10) ? `${this.faker.firstName} ${this.faker.lastName}` : this.faker.userName;
         const folderIdSomethingSomething = random(0, 1) ? 1 : random(1, 122);
 
-        this._injectionPath = `C:\\Users\\${this.computerName}\\AppData\\Local\\${sample(discords)}\\${this.discord.discordVersion}\\modules\\discord_desktop_core-${folderIdSomethingSomething}\\discord_desktop_core`;
+        this._injectionPath = `C:\\Users\\${this._computerName}\\AppData\\Local\\${sample(discords)}\\${this.discord.discordVersion}\\modules\\discord_desktop_core-${folderIdSomethingSomething}\\discord_desktop_core`;
     }
     get email() {
         return this.fakerData.email;
@@ -41,6 +41,9 @@ export class FakeAccount {
     }
     get injectionPath() {
         return this._injectionPath;
+    }
+    get computerName() {
+        return this._computerName;
     }
 }
 

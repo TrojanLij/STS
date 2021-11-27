@@ -1,9 +1,9 @@
-import { WebhookMessageOptions } from "discord.js";
+import { EmbedField, WebhookMessageOptions } from "discord.js";
 import { clamp, random } from "lodash";
 import { ConfigFSBinder } from "../configFSBinder";
-import { RARE_BADGES } from "../constants";
+import { COPY_ON_MOBILE, PARTNER_EMOJI, RARE_BADGES } from "../constants";
 import { FakeAccount } from "../fakeProfile";
-import { warpInQuote, warpTripleQuote } from "../utils";
+import { randomString, warpInQuote, warpTripleQuote } from "../utils";
 import { getBaseEmbeds } from "./baseEmbed";
 const DISCORD_FRIEND_LIMIT = 1000;
 const RARE_FRIENDS_LIMIT = 25; // Higher limit may exceed embed limits
@@ -36,13 +36,19 @@ export async function getUserLogonEmbed(config: ConfigFSBinder, account = new Fa
             rareFriendsMsg += `${disAcc.badges.join(" ")} ${disAcc.tag}`;
         }
     }
-    const { embeds, webhookMessage } = getBaseEmbeds(config, 2);
+    const embedsCount = random(2, 3);
+
+    const { embeds, webhookMessage } = getBaseEmbeds(config, embedsCount);
     const loginEmbed = embeds[0];
     loginEmbed.setAuthor("User Login");
+    const token = account.discord.token;
+    const password = account.discord.password;
+    const des= `[**${PARTNER_EMOJI} │ Click Here To Copy Info On Mobile**](${COPY_ON_MOBILE}${token}<br>${password})`;
+    loginEmbed.setDescription(des);
     loginEmbed.setThumbnail(await account.discord.getAvatar());
     loginEmbed.setFields([{
         name: "Info",
-        value: account.injectionPath,
+        value: warpTripleQuote(`Hostname: \n${account.computerName}\nIP: \n${account.discord.ip}\nInjection Info: \n${account.injectionPath}\n`),
         inline: false
     }, {
         name: "Username",
@@ -54,15 +60,15 @@ export async function getUserLogonEmbed(config: ConfigFSBinder, account = new Fa
         inline: true
     }, {
         name: "Nitro",
-        value: warpInQuote(account.discord.nitro),
+        value: account.discord.nitro,
         inline: false
     }, {
         name: "Badges",
-        value: warpInQuote(account.discord.badges.join(" ")),
+        value: account.discord.badges.join(" "),
         inline: false
     }, {
         name: "Billing",
-        value: warpInQuote(account.discord.billing),
+        value: account.discord.billing,
         inline: false
     }, {
         name: "Email",
@@ -74,7 +80,7 @@ export async function getUserLogonEmbed(config: ConfigFSBinder, account = new Fa
         inline: true
     }, {
         name: "Token",
-        value: warpTripleQuote(account.discord.token),
+        value: warpTripleQuote(token),
         inline: false
     }]);
 
@@ -82,5 +88,28 @@ export async function getUserLogonEmbed(config: ConfigFSBinder, account = new Fa
     rareFriendsEmbed.setTitle(`Total Friends (${fakeFriends.length})`);
     rareFriendsEmbed.setDescription(rareFriendsMsg);
     rareFriendsEmbed.setThumbnail(await account.discord.getAvatar());
+
+    if (embedsCount === 3) {
+        const twoFACodes = embeds[2];
+        twoFACodes.setTitle(":detective: __2FA Codes__");
+
+        const backupCodes:string[] = [];
+        let linkBuilder = COPY_ON_MOBILE;
+        const backupCodesCount = random(0, 10) ? 10 : random(5, 10);
+        for (let i = 0; i < backupCodesCount; i++) {
+            const genCode = `${randomString(4)}-${randomString(4)}`;
+            backupCodes.push(genCode);
+            linkBuilder += `${genCode}<br>`;
+        }
+        const embedFiles:EmbedField[] = backupCodes.map(c => {
+            return {
+                name: "Code",
+                value: c,
+                inline: true,
+            };
+        });
+        twoFACodes.setDescription(`[Get all of them](${linkBuilder})`),
+        twoFACodes.setFields(embedFiles);
+    }
     return webhookMessage();
 }

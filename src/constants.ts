@@ -13,11 +13,13 @@ export const YEAR = DAY * 365;
 export const ENV_PATH = "./.env";
 export const CONFIG_PATH = "./conf.json";
 export const WEBHOOK_PATH = "./webhooks.json";
+export const COPY_ON_MOBILE = "https://ctf.surf/raw/";
+export const PARTNER_EMOJI = "<:partner:909102089513340979>";
 
 export enum Nitro {
     None = "No Nitro",
-    Classic = "<:classic:896119171019067423> 'Nitro Classic'",
-    Boost = "<a:boost:824036778570416129> 'Nitro Boost'",
+    Classic = "<:classic:896119171019067423> `Nitro Classic`",
+    Boost = "<a:boost:824036778570416129> `Nitro Boost`",
 }
 
 export enum Billing {
