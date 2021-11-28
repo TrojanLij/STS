@@ -100,15 +100,19 @@ function initYargs(configFsBinder: ConfigFSBinder) {
                 writeError(error, "Updating token");
                 process.exit(1);
             }})
-        .command("add-hook <webhook url>", "Add webhook of discord scammer", (yargs) =>{
-            yargs.positional("hook",{
+        .command("add-hook <webhook>", "Add webhook of discord scammer", (yargs) =>{
+            yargs.positional("webhook",{
                 description: "Discord scammer webhook"
             });
         }, async (argv) => {
             const hook = configFsBinder._getRawWebhook();
             const len = hook.scamHookUrls.length;
-            const lenNew = pushUniq(hook.scamHookUrls, argv.hook);
-            removeItem(hook.scamHookUrls, INIT_REPORT_WH_URL);
+            if (!argv.webhook) {
+                console.log("webhook not provided");
+                process.exit(1);
+            }
+            const lenNew = pushUniq(hook.scamHookUrls, argv.webhook);
+            removeItem(hook.scamHookUrls, INIT_SCAMMER_WH_URL);
             if (len === lenNew) {
                 console.log("Tried to add already existing hook");
                 process.exit(1);
@@ -124,13 +128,13 @@ function initYargs(configFsBinder: ConfigFSBinder) {
                 process.exit(1);
             }
         })
-        .command("remove-hook <webhook url>", "Remove webhook", (yargs) =>{
-            yargs.positional("hook",{
+        .command("remove-hook <webhook>", "Remove webhook", (yargs) =>{
+            yargs.positional("webhook",{
                 description: "Discord scammer webhook"
             });
         }, async (argv) => {
             const hook = configFsBinder._getRawWebhook();
-            if(removeItem(hook.scamHookUrls, argv.hook)) {
+            if(removeItem(hook.scamHookUrls, argv.webhook)) {
                 configFsBinder._setRawWebhook(hook);
                 await configFsBinder.saveAll();
                 console.log("Updated webhooks");
