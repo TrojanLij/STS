@@ -68,15 +68,15 @@ export function getRandomIp(): string {
 }
 
 export function isCommand(msg: Message, prefix: string, checker:string) {
-    return getArgsRaw(msg)[0].toLowerCase() === `${prefix}${checker}`.toLowerCase();
+    return getArgsRaw(msg.content)[0].toLowerCase() === `${prefix}${checker}`.toLowerCase();
 }
 
-export function getArgsRaw(msg: Message) {
-    return msg.content.replace(/ +(?= )/g,"").split(" ");
+export function getArgsRaw(msg: string) {
+    return msg.replace(/ +(?= )/g,"").split(" ");
 }
 
 export function getCommandArgs(msg: Message) {
-    const args = getArgsRaw(msg);
+    const args = getArgsRaw(msg.content);
     args.shift();
     return args;
 }
@@ -92,7 +92,21 @@ export function warpTripleQuote(text: string) {
 export function warpInQuote(text: string) {
     return `\`${quoteEscape(text)}\``;
 }
-
+export function sanitiesTripleQuotes(text: string) {
+    return text.replace(/```/g, "");
+}
+export function sanitiesQuotes(text: string) {
+    return text.replace(/`/g, "");
+}
+export function sanitiesAsterisk(text: string) {
+    return text.replace(/\*/g, "");
+}
+export function sanitiesUnderline(text: string) {
+    return text.replace(/_/g, "");
+}
+export function sanitizeString(text: string) {
+    return sanitiesAsterisk(sanitiesUnderline(sanitiesQuotes(text)));
+}
 export function delay(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }

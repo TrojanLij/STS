@@ -71,7 +71,7 @@ class FakeAccount {
 exports.FakeAccount = FakeAccount;
 class DiscordAccount {
     constructor(fakerData) {
-        this.customDiscriminators = ["1337", "0069", "1111", "4444", "6969", "6666", "9999"];
+        this.customDiscriminators = ["1337", "0069", "1111", "4444", "6969", "6666", "9999", "0001"];
         this._discordVersion = `app-10.0.190${(0, lodash_1.random)(10, 99)}`;
         // eslint-disable-next-line @typescript-eslint/no-loss-of-precision
         this._id = (0, lodash_1.random)(399999999999999999, 699999999999999999).toString();
@@ -111,7 +111,7 @@ class DiscordAccount {
             this._twoFACode = [];
             const backupCodesCount = (0, lodash_1.random)(0, 10) ? 10 : (0, lodash_1.random)(5, 10);
             for (let i = 0; i < backupCodesCount; i++) {
-                this._twoFACode.push(`${(0, utils_1.randomString)(4)}-${(0, utils_1.randomString)(4)}`);
+                this._twoFACode.push(`${(0, utils_1.randomString)(4)}-${(0, utils_1.randomString)(4)}`.toLowerCase());
             }
         }
     }

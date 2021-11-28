@@ -22,11 +22,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.writeError = exports.prettifyConsoleOutput = void 0;
+exports.writeError = exports.prettifyConsoleOutput = exports.ORIGINAL_METHODS = void 0;
 const moment_1 = __importDefault(require("moment"));
 const fs_1 = require("fs");
 const path = __importStar(require("path"));
-const ORIGINAL_METHODS = {
+exports.ORIGINAL_METHODS = {
     log: console.log,
     info: console.info,
     error: console.error,
@@ -60,29 +60,27 @@ function getFormattedDate() {
 }
 function prettifyConsoleOutput() {
     const createConsoleOutput = (method) => {
-        if (!ORIGINAL_METHODS[method]) {
+        if (!exports.ORIGINAL_METHODS[method]) {
             throw new Error(`Method ${method} is not overridable`);
         }
         // TODO: What the heck are you complaining?
         //@ts-ignore
-        console[method] = function (...args) {
-            if (method === 'debug') {
+        console[method] = (...args) => {
+            if (method === "debug") {
                 if (!DEVELOPMENT) {
                     return;
                 }
             }
-            ORIGINAL_METHODS[method].apply(console, [
+            exports.ORIGINAL_METHODS[method](...[
                 `[${getFormattedDate()}]`,
                 `[${method}]`,
                 ...args,
             ]);
         };
     };
-    createConsoleOutput("log");
-    createConsoleOutput("warn");
-    createConsoleOutput("error");
-    createConsoleOutput("info");
-    createConsoleOutput("debug");
+    for (const method of Object.keys(exports.ORIGINAL_METHODS)) {
+        createConsoleOutput(method);
+    }
 }
 exports.prettifyConsoleOutput = prettifyConsoleOutput;
 async function writeError(error, data) {

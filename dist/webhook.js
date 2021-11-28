@@ -84,5 +84,16 @@ class WebhookHandler {
             failed: {},
         };
     }
+    getTotalStatus() {
+        let success = 0;
+        let failed = 0;
+        this.stats.forEach(stats => {
+            for (const key of Object.keys(stats.failed)) {
+                failed += stats.failed[key];
+            }
+            success += stats.success;
+        });
+        return { failed, success };
+    }
 }
 exports.WebhookHandler = WebhookHandler;

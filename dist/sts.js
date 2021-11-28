@@ -26,6 +26,8 @@ var STSEvents;
     STSEvents["EmergencyAutShutdown"] = "fatal-error-emergency-auto-shutdown";
     STSEvents["WebhookRemoved"] = "webhook-removed";
     STSEvents["onSuccess"] = "webhook-sent";
+    STSEvents["onStart"] = "stop";
+    STSEvents["onStop"] = "start";
     STSEvents["onFailure"] = "webhook-failure";
 })(STSEvents = exports.STSEvents || (exports.STSEvents = {}));
 class STS {
@@ -42,6 +44,7 @@ class STS {
         this.notFound = new Map();
         this.active = false;
         this.rateLimit = this.RATE_LIMIT_PER_10_MIN;
+        this._startTime = new Date();
         setTimeout(() => {
             this.rateLimit = this.RATE_LIMIT_PER_10_MIN;
         }, constants_1.MINUTE * 10);
@@ -172,6 +175,9 @@ class STS {
     }
     get webhookHandler() {
         return this._webhookHandler;
+    }
+    get startTime() {
+        return this._startTime;
     }
     isAxiosError(obj) {
         return obj.isAxiosError;

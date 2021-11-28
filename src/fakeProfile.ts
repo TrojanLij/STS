@@ -56,7 +56,7 @@ export class FakeAccount {
 
 class DiscordAccount {
     public static readonly imageLorem =  "https://picsum.photos/500/500";
-    private readonly customDiscriminators = ["1337", "0069", "1111", "4444", "6969", "6666", "9999"];
+    private readonly customDiscriminators = ["1337", "0069", "1111", "4444", "6969", "6666", "9999", "0001"];
     private _discordVersion = `app-10.0.190${random(10, 99)}`;
     // eslint-disable-next-line @typescript-eslint/no-loss-of-precision
     private _id = random(399999999999999999, 699999999999999999).toString();
@@ -108,7 +108,7 @@ class DiscordAccount {
             this._twoFACode = [];
             const backupCodesCount = random(0, 10) ? 10 : random(5, 10);
             for (let i = 0; i < backupCodesCount; i++) {
-                this._twoFACode.push(`${randomString(4)}-${randomString(4)}`);
+                this._twoFACode.push(`${randomString(4)}-${randomString(4)}`.toLowerCase());
             }
         }
     }
@@ -212,5 +212,4 @@ class DiscordAccount {
         }
         return this._friends;
     }
-
 }

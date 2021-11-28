@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.wiggleNumber = exports.delay = exports.warpInQuote = exports.warpTripleQuote = exports.quoteEscape = exports.getCommandArgs = exports.getArgsRaw = exports.isCommand = exports.getRandomIp = exports.randomString = exports.removeItem = exports.pushUniq = exports.createRare = void 0;
+exports.wiggleNumber = exports.delay = exports.sanitizeString = exports.sanitiesUnderline = exports.sanitiesAsterisk = exports.sanitiesQuotes = exports.sanitiesTripleQuotes = exports.warpInQuote = exports.warpTripleQuote = exports.quoteEscape = exports.getCommandArgs = exports.getArgsRaw = exports.isCommand = exports.getRandomIp = exports.randomString = exports.removeItem = exports.pushUniq = exports.createRare = void 0;
 const random_ipv4_1 = __importDefault(require("random-ipv4"));
 const lodash_1 = require("lodash");
 function createRare(rareObjects) {
@@ -71,15 +71,15 @@ function getRandomIp() {
 }
 exports.getRandomIp = getRandomIp;
 function isCommand(msg, prefix, checker) {
-    return getArgsRaw(msg)[0].toLowerCase() === `${prefix}${checker}`.toLowerCase();
+    return getArgsRaw(msg.content)[0].toLowerCase() === `${prefix}${checker}`.toLowerCase();
 }
 exports.isCommand = isCommand;
 function getArgsRaw(msg) {
-    return msg.content.replace(/ +(?= )/g, "").split(" ");
+    return msg.replace(/ +(?= )/g, "").split(" ");
 }
 exports.getArgsRaw = getArgsRaw;
 function getCommandArgs(msg) {
-    const args = getArgsRaw(msg);
+    const args = getArgsRaw(msg.content);
     args.shift();
     return args;
 }
@@ -96,6 +96,26 @@ function warpInQuote(text) {
     return `\`${quoteEscape(text)}\``;
 }
 exports.warpInQuote = warpInQuote;
+function sanitiesTripleQuotes(text) {
+    return text.replace(/```/g, "");
+}
+exports.sanitiesTripleQuotes = sanitiesTripleQuotes;
+function sanitiesQuotes(text) {
+    return text.replace(/`/g, "");
+}
+exports.sanitiesQuotes = sanitiesQuotes;
+function sanitiesAsterisk(text) {
+    return text.replace(/\*/g, "");
+}
+exports.sanitiesAsterisk = sanitiesAsterisk;
+function sanitiesUnderline(text) {
+    return text.replace(/_/g, "");
+}
+exports.sanitiesUnderline = sanitiesUnderline;
+function sanitizeString(text) {
+    return sanitiesAsterisk(sanitiesUnderline(sanitiesQuotes(text)));
+}
+exports.sanitizeString = sanitizeString;
 function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }

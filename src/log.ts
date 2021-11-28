@@ -2,7 +2,7 @@ import moment from "moment";
 import { existsSync, mkdirSync, writeFileSync } from "fs";
 import * as path from "path";
 
-const ORIGINAL_METHODS = {
+export const ORIGINAL_METHODS = {
     log: console.log,
     info: console.info,
     error: console.error,
@@ -46,25 +46,24 @@ export function prettifyConsoleOutput() {
         }
         // TODO: What the heck are you complaining?
         //@ts-ignore
-        console[method as any] = function (...args) {
-            if (method === 'debug') {
+        console[method as any] = (...args) => {
+            if (method === "debug") {
                 if (!DEVELOPMENT) {
                     return;
                 }
             }
 
-            ORIGINAL_METHODS[method].apply(console, [
+            ORIGINAL_METHODS[method](...[
                 `[${getFormattedDate()}]`,
                 `[${method}]`,
                 ...args,
             ]);
         };
     };
-    createConsoleOutput("log");
-    createConsoleOutput("warn");
-    createConsoleOutput("error");
-    createConsoleOutput("info");
-    createConsoleOutput("debug");
+
+    for (const method of Object.keys(ORIGINAL_METHODS)) {
+        createConsoleOutput(method as any);
+    }
 }
 
 export async function writeError(error: any, data?: string) {

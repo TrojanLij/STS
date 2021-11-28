@@ -21,12 +21,14 @@
     "parse-whois": "^1.0.0",
     "password-generator": "^2.3.2",
     "random-ipv4": "^1.0.2",
+    "readline-sync": "^1.4.10",
     "whois": "^2.13.7",
     "yargs": "^17.2.1"
   },
   "devDependencies": {
     "@types/fs-extra": "^9.0.13",
     "@types/lodash": "^4.14.177",
+    "@types/readline-sync": "^1.4.4",
     "@typescript-eslint/eslint-plugin": "^5.4.0",
     "@typescript-eslint/parser": "^5.4.0",
     "concurrently": "^6.4.0",

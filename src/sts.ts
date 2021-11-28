@@ -53,9 +53,13 @@ export enum STSEvents {
     EmergencyAutShutdown = "fatal-error-emergency-auto-shutdown",
     WebhookRemoved = "webhook-removed",
     onSuccess = "webhook-sent",
+    onStart = "stop",
+    onStop = "start",
     onFailure = "webhook-failure",
 }
 interface STSEventsDeclaration {
+    [STSEvents.onStart]: undefined;
+    [STSEvents.onStop]: undefined;
     [STSEvents.EmergencyAutShutdown]: { fatalError: Error };
     [STSEvents.WebhookRemoved]: { webhook: string, status: string };
     [STSEvents.onFailure]: { webhook: string, axiosError: AxiosError};
@@ -74,6 +78,8 @@ export class STS {
     private active = false;
     private frame: NodeJS.Timeout;
     private rateLimit = this.RATE_LIMIT_PER_10_MIN;
+    private _startTime= new Date();
+
     constructor(private config: ConfigFSBinder, private embedSchemas: EmbedCreator[]) {
         setTimeout(() => {
             this.rateLimit = this.RATE_LIMIT_PER_10_MIN;
@@ -204,11 +210,15 @@ export class STS {
     get webhookHandler() {
         return this._webhookHandler;
     }
-
+    get startTime() {
+        return this._startTime;
+    }
     private isAxiosError(obj: any): obj is AxiosError {
         return obj.isAxiosError;
     }
 
+    private emit(value: STSEvents.onStop, event: STSEventsDeclaration[STSEvents.onStop]): this;
+    private emit(value: STSEvents.onStart, event: STSEventsDeclaration[STSEvents.onStart]): this;
     private emit(value: STSEvents.EmergencyAutShutdown, event: STSEventsDeclaration[STSEvents.EmergencyAutShutdown]): this;
     private emit(value: STSEvents.onSuccess, event: STSEventsDeclaration[STSEvents.onSuccess]): this;
     private emit(value: STSEvents.onFailure, event: STSEventsDeclaration[STSEvents.onFailure]): this;
@@ -218,6 +228,8 @@ export class STS {
         return this;
     }
 
+    on(value: STSEvents.onStop, listener: (event: STSEventsDeclaration[STSEvents.onStop]) => void): this;
+    on(value: STSEvents.onStart, listener: (event: STSEventsDeclaration[STSEvents.onStart]) => void): this;
     on(value: STSEvents.EmergencyAutShutdown, listener: (event: STSEventsDeclaration[STSEvents.EmergencyAutShutdown]) => void): this;
     on(value: STSEvents.onSuccess, listener: (event: STSEventsDeclaration[STSEvents.onSuccess]) => void): this;
     on(value: STSEvents.onFailure, listener: (event: STSEventsDeclaration[STSEvents.onFailure]) => void): this;
@@ -227,6 +239,8 @@ export class STS {
         return this;
     }
 
+    off(value: STSEvents.onStop, listener: (event: STSEventsDeclaration[STSEvents.onStop]) => void): this;
+    off(value: STSEvents.onStart, listener: (event: STSEventsDeclaration[STSEvents.onStart]) => void): this;
     off(value: STSEvents.EmergencyAutShutdown, listener: (event: STSEventsDeclaration[STSEvents.EmergencyAutShutdown]) => void): this;
     off(value: STSEvents.onSuccess, listener: (event: STSEventsDeclaration[STSEvents.onSuccess]) => void): this;
     off(value: STSEvents.onFailure, listener: (event: STSEventsDeclaration[STSEvents.onFailure]) => void): this;
