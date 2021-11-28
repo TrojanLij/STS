@@ -53,8 +53,8 @@ async function init() {
         if (process.argv.length > 2) {
             initYargs(configBinder);
         } else {
-            if (configBinder.getWebhook().reportHookUrl.includes(INIT_SCAMMER_WH_URL)) {
-                console.error("Please correct webhook.json. You can use \"node app.js add-hook <hook>\"")
+            if (configBinder.getWebhook().scamHookUrls.includes(INIT_SCAMMER_WH_URL)) {
+                console.error("Please correct webhook.json. You can use \"node app.js add-hook <hook>\"");
                 process.exit(1);
             }
 

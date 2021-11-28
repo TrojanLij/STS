@@ -179,7 +179,9 @@ export async function start(config: ConfigFSBinder) {
                 // ignore
             }
         }
-        botInterface.client.destroy();
+        if (botInterface) {
+            botInterface.client.destroy();
+        }
         process.exit(0);
     };
 
