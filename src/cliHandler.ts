@@ -17,10 +17,13 @@ export class CLIHandler extends AppInput {
         this.spawnSummonCommand();
 
         for (const method of Object.keys(ORIGINAL_METHODS)) {
+
+            //@ts-ignore
+            const met = console[method];
             //@ts-ignore
             console[method] = (...args: any[]) => {
                 //@ts-ignore
-                ORIGINAL_METHODS[method](...args);
+                met(...args);
                 this.spawnSummonCommand();
             };
 
@@ -46,7 +49,7 @@ export class CLIHandler extends AppInput {
     }
 
     private consoleify(msg: WebhookMessageOptions){
-        let stringBuilder: string[] = [];
+        let stringBuilder: string[] = [""];
         if (msg.content) stringBuilder.push(sanitizeString(msg.content));
         if (msg.username) stringBuilder.push(`Username: ${sanitizeString(msg.username)}`);
         //if (msg.avatarURL) stringBuilder.push(`avatarUrl: ${msg.avatarURL}`);
@@ -77,8 +80,7 @@ export class CLIHandler extends AppInput {
     };
     private createBaseEvent<T = any>(line: string, data: T, reply: (msg: WebhookMessageOptions) => Promise<void>) {
         const args = getArgsRaw(line);
-        const argsCopy = [...args];
-        const command = argsCopy.shift().toLowerCase();
+        const command = args.shift().toLowerCase();
 
         const event: CLIEvent<T> = {
             originalInput: line,

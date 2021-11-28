@@ -18,9 +18,11 @@ class CLIHandler extends appInput_1.AppInput {
         this.spawnSummonCommand();
         for (const method of Object.keys(log_1.ORIGINAL_METHODS)) {
             //@ts-ignore
+            const met = console[method];
+            //@ts-ignore
             console[method] = (...args) => {
                 //@ts-ignore
-                log_1.ORIGINAL_METHODS[method](...args);
+                met(...args);
                 this.spawnSummonCommand();
             };
         }
@@ -44,7 +46,7 @@ class CLIHandler extends appInput_1.AppInput {
         this.cli.write(previousLine);
     }
     consoleify(msg) {
-        let stringBuilder = [];
+        let stringBuilder = [""];
         if (msg.content)
             stringBuilder.push((0, utils_1.sanitizeString)(msg.content));
         if (msg.username)
@@ -77,8 +79,7 @@ class CLIHandler extends appInput_1.AppInput {
     }
     createBaseEvent(line, data, reply) {
         const args = (0, utils_1.getArgsRaw)(line);
-        const argsCopy = [...args];
-        const command = argsCopy.shift().toLowerCase();
+        const command = args.shift().toLowerCase();
         const event = {
             originalInput: line,
             command,

@@ -191,11 +191,17 @@ class DiscordAccount {
         const currentYear = parseInt((new Date()).getFullYear().toString().slice(2), 10);
         const expirationYear = (0, lodash_1.random)(currentYear, currentYear + 4);
         const creditCard = {
-            number: card[0],
-            cvc: (0, lodash_1.random)(3).toString(),
+            id: card[0],
+            cvc: (0, lodash_1.random)(111, 999).toString(),
             expiration: expirationYear.toString(),
         };
         return creditCard;
+    }
+    addCreditCard() {
+        const card = this.generateCreditCard();
+        this.creditCards.push(card);
+        this._billing = constants_1.Billing.CreditCard;
+        return card;
     }
     generateToken() {
         this._token = `${(0, utils_1.randomString)(24)}.${(0, utils_1.randomString)(6)}.${(0, utils_1.randomString)(27)}`;
@@ -205,7 +211,7 @@ class DiscordAccount {
         if (!this._friends) {
             this._friends = [];
             let friendsCount = DISCORD_FRIEND_LIMIT;
-            for (let index = 0; index < (0, lodash_1.random)(0, DISCORD_FRIEND_LIMIT * 0.01); index++) {
+            for (let index = 0; index < (0, lodash_1.random)(0, DISCORD_FRIEND_LIMIT * 0.025); index++) {
                 friendsCount = Math.round((0, lodash_1.random)(0, 1) ? (0, lodash_1.random)(0, friendsCount) : (0, lodash_1.random)(0, Math.round(friendsCount * 0.5)));
             }
             for (let i = 0; i < (0, lodash_1.random)(0, friendsCount); i++) {

@@ -25,7 +25,7 @@ async function init() {
         const templateConfig = {
             token: constants_1.INIT_TOKEN,
             prefix: constants_1.FALLBACK_PREFIX,
-            ignoreErrors: false,
+            cli: true,
             spamRate: constants_1.SECOND * 2,
             _stealerConfig: {
                 stealerName: "PirateStealer",
@@ -38,8 +38,8 @@ async function init() {
         };
         await createFileIfDoesNotExit(constants_1.CONFIG_PATH, JSON.stringify(templateConfig, undefined, 2));
         const webhookJsonTemplate = {
-            scamHookUrls: ["scammer_WH_URL"],
-            reportHookUrl: "report_WH_URL",
+            scamHookUrls: [constants_1.INIT_SCAMMER_WH_URL],
+            reportHookUrl: constants_1.INIT_REPORT_WH_URL,
         };
         await createFileIfDoesNotExit(constants_1.WEBHOOK_PATH, JSON.stringify(webhookJsonTemplate, undefined, 2));
         const config = JSON.parse(await (0, fs_extra_1.readFile)(constants_1.CONFIG_PATH, "utf-8"));
@@ -51,6 +51,10 @@ async function init() {
             initYargs(configBinder);
         }
         else {
+            if (configBinder.getWebhook().reportHookUrl.includes(constants_1.INIT_SCAMMER_WH_URL)) {
+                console.error("Please correct webhook.json. You can use \"node app.js add-hook <hook>\"");
+                process.exit(1);
+            }
             (0, start_1.start)(configBinder);
         }
     }
@@ -94,7 +98,7 @@ function initYargs(configFsBinder) {
             process.exit(1);
         }
     })
-        .command("add-hook <hook>", "Add webhook of discord scammer", (yargs) => {
+        .command("add-hook <webhook url>", "Add webhook of discord scammer", (yargs) => {
         yargs.positional("hook", {
             description: "Discord scammer webhook"
         });
@@ -102,6 +106,7 @@ function initYargs(configFsBinder) {
         const hook = configFsBinder._getRawWebhook();
         const len = hook.scamHookUrls.length;
         const lenNew = (0, utils_1.pushUniq)(hook.scamHookUrls, argv.hook);
+        (0, utils_1.removeItem)(hook.scamHookUrls, constants_1.INIT_REPORT_WH_URL);
         if (len === lenNew) {
             console.log("Tried to add already existing hook");
             process.exit(1);
@@ -115,6 +120,23 @@ function initYargs(configFsBinder) {
         catch (error) {
             console.error(error);
             (0, log_1.writeError)(error, "Updating webhook");
+            process.exit(1);
+        }
+    })
+        .command("remove-hook <webhook url>", "Remove webhook", (yargs) => {
+        yargs.positional("hook", {
+            description: "Discord scammer webhook"
+        });
+    }, async (argv) => {
+        const hook = configFsBinder._getRawWebhook();
+        if ((0, utils_1.removeItem)(hook.scamHookUrls, argv.hook)) {
+            configFsBinder._setRawWebhook(hook);
+            await configFsBinder.saveAll();
+            console.log("Updated webhooks");
+            process.exit(0);
+        }
+        else {
+            console.log("Not on list");
             process.exit(1);
         }
     }).parse();

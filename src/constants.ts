@@ -1,6 +1,8 @@
 import { Rare } from "./interfaces";
 
 export const INIT_TOKEN = "YOUR_TOKEN_HERE";
+export const INIT_REPORT_WH_URL = "REPORT_WH_URL";
+export const INIT_SCAMMER_WH_URL = "SCAMMER_WH_URL";
 export const FALLBACK_PREFIX  = "!";
 export const SECOND = 1000;
 export const MINUTE = SECOND * 60;

@@ -1,7 +1,4 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.start = void 0;
 const sts_1 = require("./sts");
@@ -17,11 +14,10 @@ const creditCardChange_1 = require("./embeds/creditCardChange");
 const initNotify_1 = require("./embeds/initNotify");
 const loggedOut_1 = require("./embeds/loggedOut");
 const emailChange_1 = require("./embeds/emailChange");
-const appInput_1 = require("./appInput");
-const discord_js_1 = require("discord.js");
+const appInteraction_1 = require("./appInteraction");
 const utils_1 = require("./utils");
-const moment_1 = __importDefault(require("moment"));
 async function start(config) {
+    console.log("Starting....");
     const embedCreatorsSchemas = [
         { fn: discordInitialized_1.getDiscordInitializedEmbed, execute: () => true },
         { fn: login_1.getUserLogonEmbed, execute: () => true },
@@ -30,7 +26,9 @@ async function start(config) {
         { fn: emailChange_1.getUserEmailChangeEmbed, execute: () => !(0, lodash_1.random)(0, 10) },
     ];
     const appInteractions = [];
-    appInteractions.push(new cliHandler_1.CLIHandler());
+    if (config.getConfig().cli) {
+        appInteractions.push(new cliHandler_1.CLIHandler());
+    }
     const stealerConfig = config.getConfig()._stealerConfig;
     if (stealerConfig["init-notify"]) {
         embedCreatorsSchemas.unshift({ fn: initNotify_1.getInitNotifyEmbed, execute: () => true });
@@ -38,16 +36,37 @@ async function start(config) {
     if (stealerConfig["logout-notify"]) {
         embedCreatorsSchemas.push({ fn: loggedOut_1.getUserLogoutEmbed, execute: () => true });
     }
-    const sendToReportWebhook = (content) => {
-        const webhookUrl = config.getWebhook().reportHookUrl;
-        if (webhookUrl) {
-            sts.webhookHandler.send(webhookUrl, { content });
+    let reportFailed = 0;
+    const sendToReportWebhook = async (content) => {
+        const hooks = config.getWebhook();
+        const hook = hooks.reportHookUrl;
+        if (hook && hook !== constants_1.INIT_SCAMMER_WH_URL) {
+            try {
+                if (botInterface) {
+                    const user = botInterface.client.user;
+                    await sts.webhookHandler.send(hook, { username: user.username, avatarURL: user.avatarURL({ format: "png" }), content }, false);
+                }
+                else {
+                    await sts.webhookHandler.send(hook, { username: "STS report", content }, false);
+                }
+                reportFailed = 0;
+            }
+            catch (error) {
+                if (error.isAxiosError && error.response.status === 404) {
+                    reportFailed++;
+                    if (reportFailed > 5) {
+                        hooks.reportHookUrl = "";
+                        console.warn("Removed report webhook due to 404 error!");
+                    }
+                }
+            }
         }
     };
     let botInterface;
     try {
-        const discordBotInterface = new botInterface_1.DiscordBotInterface(config.getConfig().token);
+        const discordBotInterface = new botInterface_1.DiscordBotInterface(config);
         await discordBotInterface.init();
+        appInteractions.push(discordBotInterface.commandInterface);
         botInterface = discordBotInterface;
     }
     catch (error) {
@@ -61,14 +80,30 @@ async function start(config) {
     const sts = new sts_1.STS(config, embedCreatorsSchemas);
     const updateBotStatus = () => {
         if (botInterface) {
-            const { success, failed } = sts.webhookHandler.getTotalStatus();
-            const total = success + failed;
+            const { success, failed, total } = sts.webhookHandler.getTotalStats();
             botInterface.setStatus(`S${success} F:${failed} T:${total}`);
         }
     };
+    sts.on(sts_1.STSEvents.onStop, () => {
+        if (config.getWebhook().scamHookUrls.length) {
+            const message = `**STS has stopped**`;
+            console.info((0, utils_1.sanitizeString)(message));
+            sendToReportWebhook(message);
+        }
+        else {
+            const message = `STS has been suspended! Add webhook to start it again`;
+            console.info(message);
+            sendToReportWebhook(message);
+        }
+    });
+    sts.on(sts_1.STSEvents.onStart, () => {
+        const message = `**STS has started**`;
+        console.info((0, utils_1.sanitizeString)(message));
+        sendToReportWebhook(message);
+    });
     sts.on(sts_1.STSEvents.WebhookRemoved, event => {
-        const message = `${event.webhook} has been removed. Status\n${event.status}`;
-        console.info(message);
+        const message = `*${event.webhook} has been removed. Status\n${event.status}*`;
+        console.info((0, utils_1.sanitizeString)(message));
         sendToReportWebhook(message);
     });
     sts.on(sts_1.STSEvents.onFailure, async (event) => {
@@ -89,47 +124,56 @@ async function start(config) {
         }, constants_1.HOUR);
     });
     sts.start();
-    for (const appInteraction of appInteractions) {
-        appInteraction.on(appInput_1.CLIEvents.Help, event => {
-            event.reply({ content: appInput_1.cliEvents.map(c => `${c.alias[0]} = ${c.info}`).join("\n") });
+    // internal
+    if (!DEVELOPMENT) {
+        process.on("uncaughtException", async (error) => {
+            const msg = await (0, log_1.writeError)(error, "uncaughtException");
+            console.error(error);
+            sendToReportWebhook(msg);
         });
-        appInteraction.on(appInput_1.CLIEvents.Status, event => {
-            const embed = new discord_js_1.MessageEmbed();
-            embed.setTitle("HOMO REQUESTED");
-            embed.setColor(0xff00ff);
-            embed.setImage("https://c.tenor.com/TJiQDMvpWuoAAAAC/itsascam-scam.gif");
-            embed.setAuthor("Bill Clinton");
-            embed.setFooter("Fucking with scammers since 99");
-            embed.addField("StartTime", (0, utils_1.warpInQuote)(sts.startTime.toLocaleString()));
-            embed.addField("Started", (0, utils_1.warpInQuote)((0, moment_1.default)(sts.startTime).fromNow()));
-            const totalStatus = sts.webhookHandler.getTotalStatus();
-            embed.addField("How many messages? *(to little)*", (0, utils_1.warpInQuote)(totalStatus.success.toString()));
-            embed.addField("Failed request? *(oh no)*", (0, utils_1.warpInQuote)(totalStatus.failed.toString()));
-            embed.addField("Count hooks", (0, utils_1.warpInQuote)(config.getWebhook().scamHookUrls.length.toString()));
-            event.reply({ embeds: [embed.toJSON()] });
-        });
-        appInteraction.on(appInput_1.CLIEvents.QrCode, event => {
-            const content = (0, utils_1.warpTripleQuote)([
-                `█████████████████████████████████`,
-                `█████████████████████████████████`,
-                `████ ▄▄▄▄▄ █ ██▀▀ ▄▄ █ ▄▄▄▄▄ ████`,
-                `████ █   █ █  ▀█▄█▀█▀█ █   █ ████`,
-                `████ █▄▄▄█ █▀  █▄ ▀▄▀█ █▄▄▄█ ████`,
-                `████▄▄▄▄▄▄▄█▄█ ▀▄█ ▀▄█▄▄▄▄▄▄▄████`,
-                `████▄ ▀▀ ▄▄█▀█▄██▀█▀▀██▄▀ ▄ ▄████`,
-                `█████▄▀█▀▀▄▄▄ ▄▄▄▄ ▄ █ ▄▀▄ ▀█████`,
-                `████▀ █▄▀▄▄  ▀▀▀▄▀▄▀▀ ▄█▀▄▄ ▄████`,
-                `██████▀▀█ ▄█▀ ▀ ██▄▄▄██  ▄ ▀█████`,
-                `████▄▄█▄▄█▄▄▀ ▀▄█▀█▄ ▄▄▄ ▄▄██████`,
-                `████ ▄▄▄▄▄ █▀▀▄▄ ▄ ▀ █▄█ ▀▀▀█████`,
-                `████ █   █ █▄▄█▀▄█▄▀▄   ▄▄  ▀████`,
-                `████ █▄▄▄█ █▀ ▄▄ █▀█▄█▄▀▀ ▀ █████`,
-                `████▄▄▄▄▄▄▄█▄█▄██▄█▄██▄███▄▄▄████`,
-                `█████████████████████████████████`,
-                `█████████████████████████████████`,
-            ].join("\n"));
-            event.reply({ content });
+        process.on("unhandledRejection", async () => {
+            const error = new Error("unhandledRejection");
+            const msg = await (0, log_1.writeError)(error, "uncaughtException");
+            console.error(error);
+            sendToReportWebhook(msg);
         });
     }
+    let shuttingDown = false;
+    const shutdownWithReport = async (signal) => {
+        if (shuttingDown)
+            return;
+        shuttingDown = true;
+        const hook = config.getWebhook().reportHookUrl;
+        if (hook && hook !== constants_1.INIT_SCAMMER_WH_URL) {
+            const stats = sts.webhookHandler.getAllStats();
+            const statuses = [];
+            for (const key of Object.keys(stats)) {
+                statuses.push(`${key}:\nSuccess: ${stats[key].success} Failed: ${stats[key].failed} Total: ${stats[key].total} `);
+            }
+            statuses.push("");
+            const totalStats = sts.webhookHandler.getTotalStats();
+            statuses.push(`Total: Success: ${totalStats.success} Failed: ${totalStats.failed} Total: ${totalStats.success}`);
+            const content = `**Shutdown: ${signal}**\n${(0, utils_1.warpTripleQuote)(statuses.join("\n"))}`;
+            console.info((0, utils_1.sanitizeString)(content));
+            try {
+                if (botInterface) {
+                    const user = botInterface.client.user;
+                    await sts.webhookHandler.send(hook, { username: user.username, avatarURL: user.avatarURL({ format: "png" }), content }, false);
+                }
+                else {
+                    await sts.webhookHandler.send(hook, { username: "STS report", content }, false);
+                }
+            }
+            catch (error) {
+                // ignore
+            }
+        }
+        botInterface.client.destroy();
+        process.exit(0);
+    };
+    // on app close
+    const signals = ["SIGINT", "SIGTERM"];
+    signals.forEach(signal => process.on(signal, () => shutdownWithReport(signal)));
+    (0, appInteraction_1.createAppInteraction)(config, sts, appInteractions);
 }
 exports.start = start;

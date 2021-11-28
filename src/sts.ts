@@ -89,11 +89,13 @@ export class STS {
         if (!this.active) {
             this.active = true;
             this.tickOn(0);
+            this.emit(STSEvents.onStart, undefined);
         }
     }
     stop() {
         this.clearFrame();
         this.active = false;
+        this.emit(STSEvents.onStop, undefined);
     }
     private clearFrame() {
         if (this.frame) {
@@ -104,6 +106,11 @@ export class STS {
         if (!this.active) {
             return;
         }
+        if (!this.config.getWebhook().scamHookUrls.length) {
+            this.stop();
+            return;
+        }
+
         while (this.accounts.length < this.maxAccounts) {
             this.accounts.push({
                 account: new FakeAccount(),
@@ -113,12 +120,18 @@ export class STS {
         }
         const headers: RateLimits = {};
 
-        const randomAccount = sample(this.accounts);
+        let randomAccount = sample(this.accounts);
         let executed = false;
+        const hooks = this.config.getWebhook().scamHookUrls;
+        if (randomAccount && !hooks.includes(randomAccount.webhook)) {
+            removeItem(this.accounts, randomAccount);
+            randomAccount = undefined;
+        }
         if (randomAccount) {
             const schema = this.embedSchemas[randomAccount.index];
             if (schema.execute()) {
                 executed = true;
+
                 const embed = await schema.fn(this.config, randomAccount.account);
                 if (this.rateLimit <= 0) {
                     this.emit(STSEvents.EmergencyAutShutdown, { fatalError: new Error(`Emergency shut down. Exceeding the limit`) });

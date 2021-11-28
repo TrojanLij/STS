@@ -53,11 +53,13 @@ class STS {
         if (!this.active) {
             this.active = true;
             this.tickOn(0);
+            this.emit(STSEvents.onStart, undefined);
         }
     }
     stop() {
         this.clearFrame();
         this.active = false;
+        this.emit(STSEvents.onStop, undefined);
     }
     clearFrame() {
         if (this.frame) {
@@ -68,6 +70,10 @@ class STS {
         if (!this.active) {
             return;
         }
+        if (!this.config.getWebhook().scamHookUrls.length) {
+            this.stop();
+            return;
+        }
         while (this.accounts.length < this.maxAccounts) {
             this.accounts.push({
                 account: new fakeProfile_1.FakeAccount(),
@@ -76,8 +82,13 @@ class STS {
             });
         }
         const headers = {};
-        const randomAccount = (0, lodash_1.sample)(this.accounts);
+        let randomAccount = (0, lodash_1.sample)(this.accounts);
         let executed = false;
+        const hooks = this.config.getWebhook().scamHookUrls;
+        if (randomAccount && !hooks.includes(randomAccount.webhook)) {
+            (0, utils_1.removeItem)(this.accounts, randomAccount);
+            randomAccount = undefined;
+        }
         if (randomAccount) {
             const schema = this.embedSchemas[randomAccount.index];
             if (schema.execute()) {

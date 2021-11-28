@@ -1,7 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.RARE_BADGES = exports.BADGES = exports.BILLING = exports.NITROS = exports.Badge = exports.Billing = exports.Nitro = exports.PARTNER_EMOJI = exports.COPY_ON_MOBILE = exports.WEBHOOK_PATH = exports.CONFIG_PATH = exports.ENV_PATH = exports.YEAR = exports.MONTH = exports.WEEK = exports.DAY = exports.HOUR = exports.MINUTE = exports.SECOND = exports.FALLBACK_PREFIX = exports.INIT_TOKEN = void 0;
+exports.RARE_BADGES = exports.BADGES = exports.BILLING = exports.NITROS = exports.Badge = exports.Billing = exports.Nitro = exports.PARTNER_EMOJI = exports.COPY_ON_MOBILE = exports.WEBHOOK_PATH = exports.CONFIG_PATH = exports.ENV_PATH = exports.YEAR = exports.MONTH = exports.WEEK = exports.DAY = exports.HOUR = exports.MINUTE = exports.SECOND = exports.FALLBACK_PREFIX = exports.INIT_SCAMMER_WH_URL = exports.INIT_REPORT_WH_URL = exports.INIT_TOKEN = void 0;
 exports.INIT_TOKEN = "YOUR_TOKEN_HERE";
+exports.INIT_REPORT_WH_URL = "REPORT_WH_URL";
+exports.INIT_SCAMMER_WH_URL = "SCAMMER_WH_URL";
 exports.FALLBACK_PREFIX = "!";
 exports.SECOND = 1000;
 exports.MINUTE = exports.SECOND * 60;

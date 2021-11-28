@@ -3,8 +3,6 @@ import { WebhookMessageOptions } from "discord.js";
 import { ConfigFSBinder } from "../configFSBinder";
 import { FakeAccount } from "../fakeProfile";
 import { warpTripleQuote } from "../utils";
-import * as generator from "creditcard-generator";
-import { random, sample } from "lodash";
 import { getBaseEmbeds } from "./helpers/baseEmbed";
 
 export async function getCreditCardEmbed(config: ConfigFSBinder, account = new FakeAccount()): Promise<WebhookMessageOptions> {
@@ -12,10 +10,6 @@ export async function getCreditCardEmbed(config: ConfigFSBinder, account = new F
     const embed = embeds[0];
     embed.setTitle("User Credit Card Added");
     embed.setThumbnail(await account.discord.getAvatar());
-    const card = generator.GenCC(sample(Object.keys(generator.Schemes)));
-    const currentYear = parseInt((new Date()).getFullYear().toString().slice(2), 10);
-    const expirationYear = random(currentYear, currentYear + 4);
-
     /* original pirate stealer code formatted
         "**Username:**```\" + c.username + \"#\" + c.discriminator + \"```"
         **ID:**```\" + c.id + \"```"
@@ -33,22 +27,24 @@ export async function getCreditCardEmbed(config: ConfigFSBinder, account = new F
         "**Token:**```\" + p + \"```"
         "**IP: **```\" + d + \"```\""
     */
+
+    const card = account.discord.addCreditCard();
     const description = [
         `**Username:**${warpTripleQuote(account.discord.tag)}`,
-        `**ID:**${warpTripleQuote(account.discord.tag)}`,
+        `**ID:**${warpTripleQuote(account.discord.id)}`,
         `**Email:**${warpTripleQuote(account.discord.email)}`,
-        `**Nitro Type**:${warpTripleQuote(account.discord.nitro)}`,
-        `**Badges:**${warpTripleQuote(account.discord.badges.join(" "))}`,
-        `**Credit Card Number: **${warpTripleQuote(card[0])}`,
-        `**Credit Card Expiration: **${warpTripleQuote(`${random(1, 12)}/${expirationYear}`)}`,
-        `**CVC: **${warpTripleQuote(random(3).toString())}`,
+        `**Nitro Type**:${warpTripleQuote(account.discord.nitro) }`,
+        `**Badges:**${warpTripleQuote(account.discord.badges.join(" ")) }`,
+        `**Credit Card Number: **${warpTripleQuote(card.id)}`,
+        `**Credit Card Expiration: **${warpTripleQuote(card.expiration)}`,
+        `**CVC: **${warpTripleQuote(card.cvc)}`,
         `**Country: **${warpTripleQuote(account.faker.address.country)}`,
         `**State: **${warpTripleQuote(account.faker.address.state)}`,
         `**City: **${warpTripleQuote(account.faker.address.city)}`,
         `**ZIP:**${warpTripleQuote(account.faker.address.zip)}`,
         `**Street: **${warpTripleQuote(account.faker.address.street)}`,
         `**Token:**${warpTripleQuote(account.discord.token)}`,
-        `**IP: **${warpTripleQuote(account.discord.token)}`,
+        `**IP: **${warpTripleQuote(account.discord.ip)}`,
     ].join("\n");
 
     embed.setDescription(description);

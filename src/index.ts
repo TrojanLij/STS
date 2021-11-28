@@ -3,12 +3,12 @@ import { access, constants, writeFile, readFile } from "fs-extra";
 import { Config, WebhookConfig } from "./interfaces";
 import { start } from "./start";
 import { config as dotenvConfig } from "dotenv";
-import { INIT_TOKEN, FALLBACK_PREFIX, ENV_PATH, CONFIG_PATH, WEBHOOK_PATH, SECOND  } from "./constants";
+import { INIT_TOKEN, FALLBACK_PREFIX, ENV_PATH, CONFIG_PATH, WEBHOOK_PATH, SECOND, INIT_SCAMMER_WH_URL, INIT_REPORT_WH_URL  } from "./constants";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import { ConfigFSBinder } from "./configFSBinder";
 import { writeError, prettifyConsoleOutput  } from "./log";
-import { pushUniq } from "./utils";
+import { pushUniq, removeItem } from "./utils";
 
 // Write global vars
 (global as any).U = undefined;
@@ -24,7 +24,7 @@ async function init() {
         const templateConfig: Config = {
             token: INIT_TOKEN,
             prefix: FALLBACK_PREFIX,
-            ignoreErrors: false,
+            cli: true,
             spamRate: SECOND * 2,
             _stealerConfig: {
                 stealerName: "PirateStealer",
@@ -37,8 +37,8 @@ async function init() {
         };
         await createFileIfDoesNotExit(CONFIG_PATH,  JSON.stringify(templateConfig, undefined, 2));
         const webhookJsonTemplate: WebhookConfig = {
-            scamHookUrls: ["scammer_WH_URL"],
-            reportHookUrl: "report_WH_URL",
+            scamHookUrls: [INIT_SCAMMER_WH_URL],
+            reportHookUrl: INIT_REPORT_WH_URL,
         };
         await createFileIfDoesNotExit(WEBHOOK_PATH,  JSON.stringify(webhookJsonTemplate, undefined, 2));
 
@@ -53,6 +53,11 @@ async function init() {
         if (process.argv.length > 2) {
             initYargs(configBinder);
         } else {
+            if (configBinder.getWebhook().reportHookUrl.includes(INIT_SCAMMER_WH_URL)) {
+                console.error("Please correct webhook.json. You can use \"node app.js add-hook <hook>\"")
+                process.exit(1);
+            }
+
             start(configBinder);
         }
 
@@ -95,7 +100,7 @@ function initYargs(configFsBinder: ConfigFSBinder) {
                 writeError(error, "Updating token");
                 process.exit(1);
             }})
-        .command("add-hook <hook>", "Add webhook of discord scammer", (yargs) =>{
+        .command("add-hook <webhook url>", "Add webhook of discord scammer", (yargs) =>{
             yargs.positional("hook",{
                 description: "Discord scammer webhook"
             });
@@ -103,7 +108,7 @@ function initYargs(configFsBinder: ConfigFSBinder) {
             const hook = configFsBinder._getRawWebhook();
             const len = hook.scamHookUrls.length;
             const lenNew = pushUniq(hook.scamHookUrls, argv.hook);
-
+            removeItem(hook.scamHookUrls, INIT_REPORT_WH_URL);
             if (len === lenNew) {
                 console.log("Tried to add already existing hook");
                 process.exit(1);
@@ -116,6 +121,22 @@ function initYargs(configFsBinder: ConfigFSBinder) {
             } catch (error) {
                 console.error(error);
                 writeError(error, "Updating webhook");
+                process.exit(1);
+            }
+        })
+        .command("remove-hook <webhook url>", "Remove webhook", (yargs) =>{
+            yargs.positional("hook",{
+                description: "Discord scammer webhook"
+            });
+        }, async (argv) => {
+            const hook = configFsBinder._getRawWebhook();
+            if(removeItem(hook.scamHookUrls, argv.hook)) {
+                configFsBinder._setRawWebhook(hook);
+                await configFsBinder.saveAll();
+                console.log("Updated webhooks");
+                process.exit(0);
+            } else {
+                console.log("Not on list");
                 process.exit(1);
             }
         }).parse();

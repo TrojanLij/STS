@@ -1,6 +1,6 @@
 {
   "name": "sts",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "This project was to combat and annoy Discord account hijackers by flooding their webhooks with fake information.",
   "main": "app.js",
   "dependencies": {
@@ -42,7 +42,7 @@
     "typescript": "^4.5.2"
   },
   "scripts": {
-    "test": "echo \"All test have passed\" && exit 1",
+    "test": "echo \"All tests have passed\" && exit 1",
     "build:w": "tsc -w",
     "build": "tsc",
     "start": "node app.js",

@@ -1,30 +1,37 @@
 import { Client, Intents } from "discord.js";
+import { ConfigFSBinder } from "../configFSBinder";
 import { INIT_TOKEN, SECOND } from "../constants";
+import { CommandHandler } from "./commandHandler";
 
 
 export class DiscordBotInterface {
     private readonly statusUpdateLimit = 15 * SECOND;
-    private client: Client;
+    private _client: Client;
     private lastUpdate = 0;
     private frameUpdate: NodeJS.Timeout;
+    private _commandInterface: CommandHandler;
 
-    constructor(private token: string) {}
+    constructor(private config: ConfigFSBinder) {}
     async init() {
-        if (this.client) {
+        if (this._client) {
             return;
         }
-        if (!this.token || this.token === INIT_TOKEN) {
-            throw new Error("Discord bot not provided!");
+        const token = this.config.getConfig().token;
+        if (!token || token === INIT_TOKEN) {
+            throw new Error("Discord bot token not provided!");
         }
         const client = new Client({
             intents: [
                 Intents.FLAGS.GUILDS,
-                Intents.FLAGS.GUILD_WEBHOOKS,
                 Intents.FLAGS.GUILD_MESSAGES,
             ],
         });
-        await client.login(this.token);
-        this.client = client;
+        await client.login(token);
+        this._commandInterface = new CommandHandler(this.config, client);
+        console.info("Starting discord bot!");
+        await this._commandInterface.init();
+        console.info(`Discord bot started as "${client.user.tag}"`);
+        this._client = client;
         this.setStatus("Waiting");
     }
     setStatus(msg: string){
@@ -41,8 +48,8 @@ export class DiscordBotInterface {
             });
             return;
         }
-        if (this.client.user) {
-            this.client.user.setPresence({
+        if (this._client.user) {
+            this._client.user.setPresence({
                 activities: [
                     {
                         name: msg,
@@ -53,5 +60,11 @@ export class DiscordBotInterface {
             });
             this.lastUpdate = Date.now();
         }
+    }
+    get commandInterface() {
+        return this._commandInterface;
+    }
+    get client() {
+        return this._client;
     }
 }

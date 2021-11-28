@@ -44,7 +44,6 @@ export function prettifyConsoleOutput() {
         if (!ORIGINAL_METHODS[method]) {
             throw new Error(`Method ${method} is not overridable`);
         }
-        // TODO: What the heck are you complaining?
         //@ts-ignore
         console[method as any] = (...args) => {
             if (method === "debug") {

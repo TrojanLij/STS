@@ -9,14 +9,16 @@ class WebhookHandler {
     constructor() {
         this.stats = new Map();
     }
-    async send(url, data) {
+    async send(url, data, stats = true) {
         try {
             const result = await axios_1.default.post(url, data);
-            this.writeSuccessStat(url);
+            if (stats)
+                this.writeSuccessStat(url);
             return result;
         }
         catch (error) {
-            this.writeFailedStat(url, error.response?.status);
+            if (stats)
+                this.writeFailedStat(url, error.response?.status);
             return error;
         }
     }
@@ -48,13 +50,13 @@ class WebhookHandler {
     async checkHook(url) {
         try {
             const result = await axios_1.default.get(url);
-            return result.status;
+            return result;
         }
         catch (error) {
-            return error.response.status;
+            return error.response;
         }
     }
-    async shutHook(url) {
+    async deleteWebhook(url) {
         try {
             await axios_1.default.delete(url);
             return true;
@@ -84,7 +86,21 @@ class WebhookHandler {
             failed: {},
         };
     }
-    getTotalStatus() {
+    getAllStats() {
+        const webHooksStats = {};
+        this.stats.forEach((stats, key) => {
+            let failed = 0;
+            const success = stats.success;
+            for (const key of Object.keys(stats.failed)) {
+                failed += stats.failed[key];
+            }
+            webHooksStats[key] = {
+                failed, success, total: success + failed,
+            };
+        });
+        return webHooksStats;
+    }
+    getTotalStats() {
         let success = 0;
         let failed = 0;
         this.stats.forEach(stats => {
@@ -93,7 +109,7 @@ class WebhookHandler {
             }
             success += stats.success;
         });
-        return { failed, success };
+        return { failed, success, total: failed + success };
     }
 }
 exports.WebhookHandler = WebhookHandler;
