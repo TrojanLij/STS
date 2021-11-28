@@ -33,7 +33,7 @@ export class CLIHandler extends AppInput {
     private spawnSummonCommand() {
         const previousLine = this.cli.line;
         this.cli.write(null, { ctrl: true, name: "u" });
-        this.cli.question("SIS> ", line => {
+        this.cli.question("STS> ", line => {
             if (!line) return this.spawnSummonCommand();
             const args = getArgsRaw(line);
             const command = args.shift().toLowerCase();
