@@ -1,6 +1,7 @@
 # file systems
 .history
 node_modules
+dist
 
 #configuration or environment files
 conf.json
