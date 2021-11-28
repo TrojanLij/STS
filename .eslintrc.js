@@ -50,34 +50,6 @@ module.exports = {
                 "max": 2
             }
         ],
-        "no-console": [
-            "error",
-            {
-                "allow": [
-                    "log",
-                    "warn",
-                    "info",
-                    "debug",
-                    "dir",
-                    "timeLog",
-                    "assert",
-                    "clear",
-                    "count",
-                    "countReset",
-                    "group",
-                    "groupEnd",
-                    "table",
-                    "dirxml",
-                    "error",
-                    "groupCollapsed",
-                    "Console",
-                    "profile",
-                    "profileEnd",
-                    "timeStamp",
-                    "context"
-                ]
-            }
-        ],
         "eol-last": "error",
         "eqeqeq": [
             "error",
