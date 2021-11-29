@@ -56,10 +56,7 @@ export const cliEvents: CliEventDescription[] = [
     {
         event: CLIEvents.HooksStatuses,
         alias: ["hooks-stats", "hook-stats"],
-        info: "<webhook urls*> - Hooks stats",
-        args: [
-            { name: "webhook-url", description: "Webhook url", required: true}
-        ]
+        info: "Hooks stats",
     },
     {
         event: CLIEvents.UpdateReportHook,
