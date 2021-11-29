@@ -78,11 +78,12 @@ export class WebhookHandler {
     }
     private writeFailedStat(url: string, error?: number) {
         const stat = this.stats.get(url) || this.createEmptyStat();
-        if (stat.failed[error]) {
+        if (typeof stat.failed[error] === "number") {
             stat.failed[error]++;
         } else {
             stat.failed[error] = 0;
         }
+        console.log(stat);
         this.stats.set(url, stat);
     }
     private createEmptyStat(): WebhookStats {
