@@ -1,11 +1,11 @@
 # file systems
 .history
 node_modules
+dist
 
 #configuration or environment files
 conf.json
 .env
-.eslintrc.js
 
 # log files
 log
