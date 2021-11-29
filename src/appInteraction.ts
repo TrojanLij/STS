@@ -12,8 +12,10 @@ import { getInitNotifyEmbed } from "./embeds/initNotify";
 import { getUserPasswordChangeEmbed } from "./embeds/passwordChange";
 import { getCreditCardEmbed } from "./embeds/creditCardChange";
 import { getDiscordInitializedEmbedUserNotLoggedIn } from "./embeds/discordInitialized";
+import { shutdownWithReport } from "./shutdown";
+import { DiscordBotInterface } from "./discordBotInterface/botInterface";
 
-export function createAppInteraction(config: ConfigFSBinder, sts:STS, appInteractions: AppInput[]) {
+export function createAppInteraction(config: ConfigFSBinder, sts:STS, appInteractions: AppInput[], botInterface?: DiscordBotInterface) {
     for (const appInteraction of appInteractions) {
         appInteraction.on(CLIEvents.Help, event => {
             let prefix = "";
@@ -287,8 +289,11 @@ export function createAppInteraction(config: ConfigFSBinder, sts:STS, appInterac
                 ].join("\n"));
             event.reply({content});
         });
+        appInteraction.on(CLIEvents.Exit, event => {
+            event.reply({content: "Shutting down..."});
+            shutdownWithReport(config, sts, botInterface, "COMMAND");
+        });
     }
-
 }
 
 

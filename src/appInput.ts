@@ -10,6 +10,7 @@ export enum CLIEvents {
     ConfigHookAdd = "cfg-hook-add",
     HooksStatuses = "hooks-status",
     UpdateReportHook = "update-report-hooks",
+    Exit = "exit",
     Embeds = "test-embeds",
     QrCode = "qr-code",
 }
@@ -74,6 +75,10 @@ export const cliEvents: CliEventDescription[] = [
         event: CLIEvents.QrCode, alias: ["rr"],
         info: "Sends mysterious qrcode"
     },
+    {
+        event: CLIEvents.Exit, alias: ["exit", "close", "terminate"],
+        info: "Shutdown the app"
+    },
 ];
 
 interface CliEventDescription {
@@ -101,6 +106,7 @@ export interface CLIEvent<T = any> {
 export abstract class AppInput {
     private eventListener = new EventEmitter();
 
+    protected emit(value: CLIEvents.Exit, event: CLIEvent): this;
     protected emit(value: CLIEvents.Embeds, event: CLIEvent): this;
     protected emit(value: CLIEvents.UpdateReportHook, event: CLIEvent): this;
     protected emit(value: CLIEvents.HooksStatuses, event: CLIEvent): this;
@@ -116,6 +122,7 @@ export abstract class AppInput {
         return this;
     }
 
+    on(value: CLIEvents.Exit, listener: (event: CLIEvent) => void): this;
     on(value: CLIEvents.Embeds, listener: (event: CLIEvent) => void): this;
     on(value: CLIEvents.UpdateReportHook, listener: (event: CLIEvent) => void): this;
     on(value: CLIEvents.HooksStatuses, listener: (event: CLIEvent) => void): this;
@@ -131,6 +138,7 @@ export abstract class AppInput {
         return this;
     }
 
+    off(value: CLIEvents.Exit, listener: (event: CLIEvent) => void): this;
     off(value: CLIEvents.Embeds, listener: (event: CLIEvent) => void): this;
     off(value: CLIEvents.UpdateReportHook, listener: (event: CLIEvent) => void): this;
     off(value: CLIEvents.HooksStatuses, listener: (event: CLIEvent) => void): this;

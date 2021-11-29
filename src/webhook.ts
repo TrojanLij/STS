@@ -14,10 +14,14 @@ interface WebhookStat {
     total: number;
 }
 
+interface FixedWebhookMessageOptions extends Omit<WebhookMessageOptions, "avatarURL"> {
+    avatar_url?: string;
+}
+
 
 export class WebhookHandler {
     private stats = new Map<string, WebhookStats>();
-    async send(url: string, data: WebhookMessageOptions, stats = true) {
+    async send(url: string, data: FixedWebhookMessageOptions, stats = true) {
         try {
             const result = await axios.post(url, data);
             if (stats) this.writeSuccessStat(url);
