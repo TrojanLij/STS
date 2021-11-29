@@ -56,7 +56,7 @@ _For NodeJS requirements and package requirements read **package.json**. Or just
 
 # Installation
 ```bash
-git clone https://(https://github.com/TrojanLij/STS.git)
+git clone https://github.com/TrojanLij/STS.git
 cd STS
 npm i
 npm run build
@@ -93,13 +93,13 @@ If you want to go rummaging around the code and are interested in any advanced c
 
 ## TODO Important:
 - [x] Add ability to run even **WITHOUT** Discord bot token (why limit to bots only)
+- [x] Added CLI runtime (@Lidcer you smart dude...)
 - [ ] Fix some of the /commands
 - [ ] @TrojanLij Learn to GIT!!!!
 
 ## TODO Update:
 - [x] Ability to add multiple webhooks that belong to hackers
-- [ ] If a 404 for WH, try again, if another 404, wait 60s then try last time.
-  - [ ] `--> If last time 404 then return in reportHook *Tango down*`
+- [x] If a 404 for WH remove.
 
 ## TODO Discord bot /FEATURES/:
 - [ ] **/HOOK/:**
@@ -117,7 +117,7 @@ If you want to go rummaging around the code and are interested in any advanced c
 ## TODO Later:
 - [ ] A random RR bc why the hell now (added to *do later*)
 - [ ] Fetch every X seconds a list of scam webhooks
-
+- [ ] Add easy webhook list share feature
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 [contributors-shield]: https://img.shields.io/github/contributors/TrojanLij/STS.svg?style=for-the-badge
