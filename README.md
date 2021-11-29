@@ -52,35 +52,35 @@ STS allows users to participate in a group to flood multiple scammer webhooks or
 <!-- Lists of found or submitted webhooks are refreshed at user defined intervals and updated across the board so all users are up-to-date with found or closed webhooks. **_(we are still working on this part)_** -->
 
 # Requirements
-
-_For NodeJS requirements and package requirements read **package.json**._
+_For NodeJS requirements and package requirements read **package.json**. Or just run `npm i && npm run build`..._
 
 # Installation
 ```bash
 git clone https://(https://github.com/TrojanLij/STS.git)
 cd STS
-npm install
-node .\app.js
+npm i
+npm run build
+npm start
 ```
 
 ## Basic usage:
 To run the script simply execute:
 ```bash
-node .\app.js
+npm start
 ```
 
 ## Add Discord Bot token:
 If the file was not created then just add a `conf.js` manually to the root of the folder.
 To add a personalized bot token and use the bot Discord commands use:
 ```bash
-node .\app.js token "YOUR TOKEN HERE"
+npm start token "YOUR TOKEN HERE"
 ```
 
 ## Add a scammer webhook to your local file:
 If the file was not created then just add a `webhooks.json` manually to the root of the folder.
 To add a webhook belonging to the scammers to your local webhook.json use the command:
 ```bash
-node .\app.js add-hook "SCAMMER WEBHOOK HERE"
+npm start add-hook "SCAMMER WEBHOOK HERE"
 ```
 
 ## Advanced configuration:
@@ -94,7 +94,6 @@ If you want to go rummaging around the code and are interested in any advanced c
 ## TODO Important:
 - [x] Add ability to run even **WITHOUT** Discord bot token (why limit to bots only)
 - [ ] Fix some of the /commands
-- [ ] Add pre-run self configuration and necessary file generation with instructions (mostly done)
 - [ ] @TrojanLij Learn to GIT!!!!
 
 ## TODO Update:
@@ -104,12 +103,15 @@ If you want to go rummaging around the code and are interested in any advanced c
 
 ## TODO Discord bot /FEATURES/:
 - [ ] **/HOOK/:**
-  - [x] Add `add-hook` command
-  - [x] `add-hook` checks the hooks status
-  - [x] Change `del-hook` to remove hook instead of sending DELETE request
-  - [x] `del-hook` checks if it is a valid hook, if true then sends DELETE then waits 5s to check again in case of error
-  - [x] Set `close-hook` to send DELETE request 
+  - [x] Discord `help` command to list all commands and usage 
+  - [x] Add `cfg-hook` command category for local manipulation of config file / webhook list
+    - [x] `cfg-hook-add` adds webhooks to local webhook.json
+    - [x] `cfg-hook-remove` removes webhooks from local webhook.json
+  - [x] `hook-close` sends DELETE request to webhook
+  - [x] `check-hook` checks if it is a valid hook / returns HTTP status code
+  - [x] `update-report-hook` updates report hook in webhooks.json 
   - [x] `close-hook` removes hook from local webhook.json if exists
+  - [x] `test-embeds` displays all embeds
 - [x] Add bot presence to display prefix
 
 ## TODO Later:
