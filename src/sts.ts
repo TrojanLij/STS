@@ -127,6 +127,7 @@ export class STS {
             removeItem(this.accounts, randomAccount);
             randomAccount = undefined;
         }
+        let multiplyTime = 0;
         if (randomAccount) {
             const schema = this.embedSchemas[randomAccount.index];
             if (schema.execute()) {
@@ -145,15 +146,18 @@ export class STS {
                 if (this.isAxiosError(result)) {
                     response = result.response;
                     error = result;
+                    multiplyTime = SECOND * 5;
                 } else {
                     response = result;
                 }
                 if (response) {
-                    headers.bucket =     response.headers[RateLimitHeaders.Bucket];
-                    headers.limit =      parseFloat(response.headers[RateLimitHeaders.Limit]);
-                    headers.remaining =  parseFloat(response.headers[RateLimitHeaders.Remaining]);
-                    headers.reset =      parseFloat(response.headers[RateLimitHeaders.Reset]);
-                    headers.resetAfter = parseFloat(response.headers[RateLimitHeaders.ResetAfter]);
+                    if (headers && response.headers) {
+                        headers.bucket =     response.headers[RateLimitHeaders.Bucket];
+                        headers.limit =      parseFloat(response.headers[RateLimitHeaders.Limit]);
+                        headers.remaining =  parseFloat(response.headers[RateLimitHeaders.Remaining]);
+                        headers.reset =      parseFloat(response.headers[RateLimitHeaders.Reset]);
+                        headers.resetAfter = parseFloat(response.headers[RateLimitHeaders.ResetAfter]);
+                    }
                     if (response.status === HTTPCode.TooManyRequests) { // To many requests;
                         headers.rateLimitRetryAfter = parseFloat(response.data.retry_after);
                     } else if (response.status === HTTPCode.NotFound) {
@@ -163,11 +167,16 @@ export class STS {
                             const webHooks = this.config.getWebhook();
                             removeItem(webHooks.scamHookUrls, randomAccount.webhook);
                             removeItem(this.accounts, randomAccount);
-                            this.eventListener.emit(STSEvents.WebhookRemoved, this._webhookHandler.getWebhookStats(randomAccount.webhook));
+                            const hookStatus = this._webhookHandler.getWebhookStats(randomAccount.webhook);
+                            this.eventListener.emit(STSEvents.WebhookRemoved, {
+                                webhook: randomAccount.webhook,
+                                status: hookStatus
+                            });
                             this._webhookHandler.clearWebhookStats(randomAccount.webhook);
                             this.notFound.delete(randomAccount.webhook);
+                        } else {
+                            this.notFound.set(randomAccount.webhook, counter);
                         }
-                        this.notFound.set(randomAccount.webhook, counter);
                     }
                     if (response.status !== HTTPCode.NotFound) {
                         this.notFound.delete(randomAccount.webhook);
@@ -187,18 +196,18 @@ export class STS {
         if (executed) {
             // Spam as long as we don't get rate limited ;)
             if (headers) {
-                if (headers.remaining > 1 && !headers.rateLimitRetryAfter) {
+                if (headers.remaining && headers.remaining > 1 && !headers.rateLimitRetryAfter) {
                     const ms = headers.resetAfter * SECOND;
-                    const sendIn = ms / (headers.remaining );
-                    this.tickOn(sendIn);
+                    const sendIn = ms / (headers.remaining);
+                    this.tickOn(sendIn + multiplyTime);
                     return;
                 } else {
-                    const wait = headers.rateLimitRetryAfter ? headers.rateLimitRetryAfter : headers.resetAfter;
-                    this.tickOn((wait + 1) * SECOND);
+                    const wait = (headers.rateLimitRetryAfter ? headers.rateLimitRetryAfter : headers.resetAfter) || 2;
+                    this.tickOn((wait + 1) * SECOND + multiplyTime);
                     return;
                 }
             } else {
-                this.tickOn(SECOND * 16);
+                this.tickOn(SECOND * 16 + multiplyTime);
                 return;
             }
         } else {
