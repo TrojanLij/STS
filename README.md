@@ -66,7 +66,7 @@ npm start
 ## Instalation example
 <div align="center">
 
-[![Installing sts gif]][STSinstallGIF]
+![Installing sts gif][STSinstallGIF]
 
 </div>
 
