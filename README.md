@@ -65,7 +65,9 @@ npm start
 
 ## Instalation example
 <div align="center">
-<img src="https://pluto.trojanlij.dev/installing-STS2.gif" />
+
+[![Installing sts gif]][STSinstallGIF]
+
 </div>
 
 ## Basic usage:
@@ -137,5 +139,5 @@ If you want to go rummaging around the code and are interested in any advanced c
 [license-url]: https://github.com/TrojanLij/STS/blob/main/LICENSE.txt
 [discord-shield]: https://img.shields.io/discord/780429830184239144?label=Discord&style=for-the-badge
 [discord-url]: https://discord.gg/kBdkUBywz6
-
+[STSinstallGIF]: https://pluto.trojanlij.dev/installing-STS2.gif
 
