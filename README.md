@@ -63,6 +63,11 @@ npm run build
 npm start
 ```
 
+## Instalation example
+<div align="center">
+![Installing STS GIF](https://pluto.trojanlij.dev/installing-STS2.gif)
+</div>
+
 ## Basic usage:
 To run the script simply execute:
 ```bash
