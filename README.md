@@ -63,13 +63,6 @@ npm run build
 npm start
 ```
 
-## Instalation example
-<div align="center">
-
-![Installing sts gif](./img/installing-STS2.gif)
-
-</div>
-
 ## Basic usage:
 To run the script simply execute:
 ```bash

@@ -115,3 +115,13 @@ export enum HTTPCode {
     NetworkReadTimeoutError = 598,
     NetworkConnectTimeoutError = 599,
 }
+
+export interface ConfigBinder {
+    getConfig: () => Config;
+    getWebhook: () => WebhookConfig;
+    _getRawConfig: () => Config;
+    _getRawWebhook: () => WebhookConfig;
+    _setRawConfig: (config: Config) => void;
+    _setRawWebhook: (webhook: WebhookConfig) => void;
+    saveAll(): Promise<void>;
+}

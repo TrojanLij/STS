@@ -1,11 +1,11 @@
 /// <reference path="../typeFix/creditcardGenerator.d.ts"/>
 import { WebhookMessageOptions } from "discord.js";
-import { ConfigFSBinder } from "../configFSBinder";
+import { ConfigBinder } from "../interfaces";
 import { FakeAccount } from "../fakeProfile";
 import { warpTripleQuote } from "../utils";
 import { getBaseEmbeds } from "./helpers/baseEmbed";
 
-export async function getCreditCardEmbed(config: ConfigFSBinder, account = new FakeAccount()): Promise<WebhookMessageOptions> {
+export async function getCreditCardEmbed(config: ConfigBinder, account = new FakeAccount()): Promise<WebhookMessageOptions> {
     const { embeds, webhookMessage } = getBaseEmbeds(config);
     const embed = embeds[0];
     embed.setTitle("User Credit Card Added");

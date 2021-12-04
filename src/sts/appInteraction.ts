@@ -1,7 +1,6 @@
 import { Interaction, Message, MessageEmbed } from "discord.js";
 import moment from "moment";
 import { STS } from "./sts";
-import { ConfigFSBinder } from "./configFSBinder";
 import { AppInput, CLIEvent, cliEvents, CLIEvents } from "./appInput";
 import { removeItem, warpInQuote, warpTripleQuote } from "./utils";
 import { AxiosError } from "axios";
@@ -14,8 +13,9 @@ import { getCreditCardEmbed } from "./embeds/creditCardChange";
 import { getDiscordInitializedEmbedUserNotLoggedIn } from "./embeds/discordInitialized";
 import { shutdownWithReport } from "./shutdown";
 import { DiscordBotInterface } from "./discordBotInterface/botInterface";
+import { ConfigBinder } from "./interfaces";
 
-export function createAppInteraction(config: ConfigFSBinder, sts:STS, appInteractions: AppInput[], botInterface?: DiscordBotInterface) {
+export function createAppInteraction(config: ConfigBinder, sts:STS, appInteractions: AppInput[], botInterface?: DiscordBotInterface) {
     for (const appInteraction of appInteractions) {
         appInteraction.on(CLIEvents.Help, event => {
             let prefix = "";
@@ -297,7 +297,7 @@ export function createAppInteraction(config: ConfigFSBinder, sts:STS, appInterac
 }
 
 
-function provideWebhook(config: ConfigFSBinder, event: CLIEvent<any>) {
+function provideWebhook(config: ConfigBinder, event: CLIEvent<any>) {
     let prefix = "";
     let exampleWebhook = `https://discord.com/api/webhooks/000000000000000000/gibberish`;
     if (event.data instanceof Message) {

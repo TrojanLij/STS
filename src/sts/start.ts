@@ -1,4 +1,3 @@
-import { ConfigFSBinder } from "./configFSBinder";
 import { EmbedCreator, STS, STSEvents } from "./sts";
 import { random } from "lodash";
 import { writeError } from "./log";
@@ -18,9 +17,15 @@ import { createAppInteraction } from "./appInteraction";
 import { AxiosError } from "axios";
 import { sanitizeString } from "./utils";
 import { shutdownWithReport } from "./shutdown";
+import { ConfigBinder } from "./interfaces";
 
+export interface StartReturn {
+    sts: STS;
+    appInteractions: AppInput[];
+    botInterface: DiscordBotInterface;
+}
 
-export async function start(config: ConfigFSBinder) {
+export async function start(config: ConfigBinder) {
     console.log("Starting....");
     const embedCreatorsSchemas: EmbedCreator[] = [
         { fn: getDiscordInitializedEmbed, execute: () => true },
@@ -159,4 +164,11 @@ export async function start(config: ConfigFSBinder) {
     signals.forEach(signal => process.on(signal, () => shutdownWithReport(config, sts, botInterface, signal)));
 
     createAppInteraction(config, sts, appInteractions);
+
+
+    return {
+        sts,
+        appInteractions,
+        botInterface
+    };
 }

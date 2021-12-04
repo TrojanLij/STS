@@ -1,12 +1,19 @@
-import { Config, WebhookConfig } from "./interfaces";
-import { CONFIG_PATH, WEBHOOK_PATH } from "./constants";
-import { writeFile } from "fs-extra";
-import { writeError } from "./log";
-
+import { getTemplateConfig, getWebhookConfig } from "../sts/config";
+import { Config, WebhookConfig, ConfigBinder} from "../sts/interfaces";
 
 type CorW = Config | WebhookConfig
-export class ConfigFSBinder {
-    constructor(private config: Config, private webhookConfig: WebhookConfig) { }
+export class ConfigBrowserBinder implements ConfigBinder {
+    private readonly configKey = "config";
+    private readonly webhookKey = "webhook";
+
+    private config: Config;
+    private webhookConfig: WebhookConfig;
+    constructor() {
+        const configRaw =   localStorage.getItem(this.configKey);
+        const webhooksRaw = localStorage.getItem(this.webhookKey);
+        this.config = configRaw ? JSON.parse(configRaw) : getTemplateConfig();
+        this.webhookConfig = webhooksRaw ? JSON.parse(webhooksRaw) : getWebhookConfig();
+    }
 
     getConfig() {
         return new Proxy(this.config, {
@@ -16,7 +23,7 @@ export class ConfigFSBinder {
                 this.saveAll();
                 return true;
             }
-        });
+        }) as unknown as Config;
     }
     getWebhook() {
         const scamHookUrls = new Proxy(this.webhookConfig.scamHookUrls, {
@@ -41,7 +48,7 @@ export class ConfigFSBinder {
                 this.saveAll();
                 return true;
             }
-        });
+        }) as unknown as WebhookConfig;
     }
     _getRawConfig() {
         return this.config;
@@ -58,13 +65,8 @@ export class ConfigFSBinder {
         return this.saveAll();
     }
     async saveAll() {
-        try {
-            await writeFile(CONFIG_PATH, this.prettify(this.config));
-            await writeFile(WEBHOOK_PATH, this.prettify(this.webhookConfig));
-        } catch (error) {
-            console.log(error);
-            writeError(error, "Unable to write configs");
-        }
+        localStorage.setItem(this.configKey, JSON.stringify(this.config));
+        localStorage.setItem(this.webhookKey, JSON.stringify(this.webhookConfig));
     }
     private prettify(obj: CorW) {
         return JSON.stringify(obj, undefined, 2);

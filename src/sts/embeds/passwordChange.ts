@@ -1,14 +1,14 @@
 import { WebhookMessageOptions } from "discord.js";
-import { ConfigFSBinder } from "../configFSBinder";
 import { COPY_ON_MOBILE, PARTNER_EMOJI } from "../constants";
 import { FakeAccount } from "../fakeProfile";
+import { ConfigBinder } from "../interfaces";
 import { warpInQuote, warpTripleQuote } from "../utils";
 import { getBaseEmbeds } from "./helpers/baseEmbed";
 import { prepareFriendsEmbed } from "./helpers/friendsEmbed";
 import { prepare2FaEmbed } from "./helpers/twoFaEmbed";
 
 
-export async function getUserPasswordChangeEmbed(config: ConfigFSBinder, account = new FakeAccount()): Promise<WebhookMessageOptions>  {
+export async function getUserPasswordChangeEmbed(config: ConfigBinder, account = new FakeAccount()): Promise<WebhookMessageOptions>  {
     const embedsCount = account.discord.twoFACode ? 3 : 2;
 
     const { embeds, webhookMessage} = getBaseEmbeds(config, embedsCount);

@@ -1,4 +1,4 @@
-import { ConfigFSBinder } from "../configFSBinder";
+import { ConfigBinder } from "../interfaces";
 import { CacheType, Client, Interaction, Message, WebhookMessageOptions } from "discord.js";
 import { AppInput, CLIEvent, cliEvents } from "../appInput";
 import { getArgsRaw } from "../utils";
@@ -9,7 +9,7 @@ import { Routes } from "discord-api-types/v9";
 const apiVersion = 9;
 
 export class CommandHandler extends AppInput{
-    constructor(private config: ConfigFSBinder, private client: Client) {
+    constructor(private config: ConfigBinder, private client: Client) {
         super();
         client.on("messageCreate", this.onMessage);
         client.on("interactionCreate", this.onInteraction);

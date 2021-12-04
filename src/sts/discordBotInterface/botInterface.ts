@@ -1,5 +1,5 @@
 import { Client, Intents } from "discord.js";
-import { ConfigFSBinder } from "../configFSBinder";
+import { ConfigBinder } from "../interfaces";
 import { INIT_TOKEN, SECOND } from "../constants";
 import { CommandHandler } from "./commandHandler";
 
@@ -11,7 +11,7 @@ export class DiscordBotInterface {
     private frameUpdate: NodeJS.Timeout;
     private _commandInterface: CommandHandler;
 
-    constructor(private config: ConfigFSBinder) {}
+    constructor(private config: ConfigBinder) {}
     async init() {
         if (this._client) {
             return;

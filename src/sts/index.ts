@@ -1,12 +1,12 @@
 /// <reference path="typeFix/fix.d.ts" />
 import { access, constants, writeFile, readFile } from "fs-extra";
-import { Config, WebhookConfig } from "./interfaces";
+import { Config, ConfigBinder, WebhookConfig } from "./interfaces";
 import { start } from "./start";
 import { config as dotenvConfig } from "dotenv";
-import { INIT_TOKEN, FALLBACK_PREFIX, ENV_PATH, CONFIG_PATH, WEBHOOK_PATH, SECOND, INIT_SCAMMER_WH_URL, INIT_REPORT_WH_URL  } from "./constants";
+import { ENV_PATH, CONFIG_PATH, WEBHOOK_PATH, INIT_SCAMMER_WH_URL  } from "./constants";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
-import { ConfigFSBinder } from "./configFSBinder";
+import { ConfigFsBinder } from "./configFSBinder";
 import { writeError, prettifyConsoleOutput  } from "./log";
 import { pushUniq, removeItem } from "./utils";
 
@@ -21,26 +21,8 @@ prettifyConsoleOutput();
 async function init() {
     try {
         await createFileIfDoesNotExit(ENV_PATH,  "NODE_ENV=\"production\"");
-        const templateConfig: Config = {
-            token: INIT_TOKEN,
-            prefix: FALLBACK_PREFIX,
-            cli: true,
-            spamRate: SECOND * 2,
-            _stealerConfig: {
-                stealerName: "PirateStealer",
-                logout: "%LOGOUT%",
-                "logout-notify": true,
-                "init-notify": true,
-                "embed-color": 3447704,
-                "disable-qr-code": false,
-            }
-        };
-        await createFileIfDoesNotExit(CONFIG_PATH,  JSON.stringify(templateConfig, undefined, 2));
-        const webhookJsonTemplate: WebhookConfig = {
-            scamHookUrls: [INIT_SCAMMER_WH_URL],
-            reportHookUrl: INIT_REPORT_WH_URL,
-        };
-        await createFileIfDoesNotExit(WEBHOOK_PATH,  JSON.stringify(webhookJsonTemplate, undefined, 2));
+        await createFileIfDoesNotExit(CONFIG_PATH,  JSON.stringify(getTemplateConfig(), undefined, 2));
+        await createFileIfDoesNotExit(WEBHOOK_PATH,  JSON.stringify(getWebhookConfig(), undefined, 2));
 
         const config = JSON.parse(await readFile(CONFIG_PATH, "utf-8")) as Config;
         const webhooks = JSON.parse(await readFile(WEBHOOK_PATH, "utf-8")) as WebhookConfig;
@@ -48,7 +30,7 @@ async function init() {
         dotenvConfig();
         (global as any).DEVELOPMENT = process.env.NODE_ENV !== "production";
 
-        const configBinder = new ConfigFSBinder(config, webhooks);
+        const configBinder = new ConfigFsBinder(config, webhooks);
 
         if (process.argv.length > 2) {
             initYargs(configBinder);
@@ -79,7 +61,7 @@ async function createFileIfDoesNotExit(path: string, fallbackContent: string) {
     }
 }
 
-function initYargs(configFsBinder: ConfigFSBinder) {
+function initYargs(configBinder: ConfigBinder) {
     yargs(hideBin(process.argv))
         .command("token <token>", "Add or update Discord token", (yargs) => {
             yargs.positional("token", {
@@ -88,11 +70,11 @@ function initYargs(configFsBinder: ConfigFSBinder) {
             });
         },
         async (argv) => {
-            const cfg = configFsBinder._getRawConfig();
+            const cfg = configBinder._getRawConfig();
             cfg.token = argv.token as string;
             try {
-                configFsBinder._setRawConfig(cfg);
-                await configFsBinder.saveAll();
+                configBinder._setRawConfig(cfg);
+                await configBinder.saveAll();
                 console.log("Updated discord token");
                 process.exit(0);
             } catch (error) {
@@ -105,7 +87,7 @@ function initYargs(configFsBinder: ConfigFSBinder) {
                 description: "Discord scammer webhook"
             });
         }, async (argv) => {
-            const hook = configFsBinder._getRawWebhook();
+            const hook = configBinder._getRawWebhook();
             const len = hook.scamHookUrls.length;
             if (!argv.webhook) {
                 console.log("webhook not provided");
@@ -118,8 +100,8 @@ function initYargs(configFsBinder: ConfigFSBinder) {
                 process.exit(1);
             }
             try {
-                configFsBinder._setRawWebhook(hook);
-                await configFsBinder.saveAll();
+                configBinder._setRawWebhook(hook);
+                await configBinder.saveAll();
                 console.log("Updated webhook");
                 process.exit(0);
             } catch (error) {
@@ -133,10 +115,10 @@ function initYargs(configFsBinder: ConfigFSBinder) {
                 description: "Discord scammer webhook"
             });
         }, async (argv) => {
-            const hook = configFsBinder._getRawWebhook();
+            const hook = configBinder._getRawWebhook();
             if(removeItem(hook.scamHookUrls, argv.webhook)) {
-                configFsBinder._setRawWebhook(hook);
-                await configFsBinder.saveAll();
+                configBinder._setRawWebhook(hook);
+                await configBinder.saveAll();
                 console.log("Updated webhooks");
                 process.exit(0);
             } else {
@@ -147,3 +129,11 @@ function initYargs(configFsBinder: ConfigFSBinder) {
 }
 
 init();
+function getTemplateConfig(): any {
+    throw new Error("Function not implemented.");
+}
+
+function getWebhookConfig(): any {
+    throw new Error("Function not implemented.");
+}
+

@@ -1,11 +1,11 @@
-import { ConfigFSBinder } from "./configFSBinder";
 import { STS } from "./sts";
 import { DiscordBotInterface } from "./discordBotInterface/botInterface";
 import { INIT_SCAMMER_WH_URL } from "./constants";
 import { warpTripleQuote, sanitizeString } from "./utils";
+import { ConfigBinder } from "./interfaces";
 
 let shuttingDown = false;
-export async function shutdownWithReport(config: ConfigFSBinder, sts:STS, bot: DiscordBotInterface, signal: string) {
+export async function shutdownWithReport(config: ConfigBinder, sts:STS, bot: DiscordBotInterface, signal: string) {
     if(shuttingDown) return;
     shuttingDown = true;
     const hook = config.getWebhook().reportHookUrl;

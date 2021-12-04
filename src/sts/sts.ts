@@ -1,15 +1,14 @@
-import { ConfigFSBinder } from "./configFSBinder";
 import { WebhookHandler } from "./webhook";
 import { FakeAccount } from "./fakeProfile";
 import { WebhookMessageOptions } from "discord.js";
 import { sample } from "lodash";
 import { removeItem } from "./utils";
 import { MINUTE, SECOND } from "./constants";
-import { HTTPCode } from "./interfaces";
+import { ConfigBinder, HTTPCode } from "./interfaces";
 import { EventEmitter } from "events";
 import { AxiosError, AxiosResponse } from "axios";
 
-type EmbedCreatorFn = (config: ConfigFSBinder, account: FakeAccount) => Promise<WebhookMessageOptions> | WebhookMessageOptions;
+type EmbedCreatorFn = (config: ConfigBinder, account: FakeAccount) => Promise<WebhookMessageOptions> | WebhookMessageOptions;
 type ShouldExecuteFn = () => boolean;
 
 export interface EmbedCreator {
@@ -80,7 +79,7 @@ export class STS {
     private rateLimit = this.RATE_LIMIT_PER_10_MIN;
     private _startTime= new Date();
 
-    constructor(private config: ConfigFSBinder, private embedSchemas: EmbedCreator[]) {
+    constructor(private config: ConfigBinder, private embedSchemas: EmbedCreator[]) {
         setTimeout(() => {
             this.rateLimit = this.RATE_LIMIT_PER_10_MIN;
         }, MINUTE * 10);
