@@ -133,4 +133,6 @@ If you want to go rummaging around the code and are interested in any advanced c
 [discord-shield]: https://img.shields.io/discord/780429830184239144?label=Discord&style=for-the-badge
 [discord-url]: https://discord.gg/kBdkUBywz6
 
-
+<!-- SOCIAL TAGS -->
+[reddit-shield]: https://img.shields.io/reddit/subreddit-subscribers/fscammers?style=for-the-badge
+[reddit-url]: https://www.reddit.com/r/fscammers/
