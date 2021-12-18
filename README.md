@@ -36,8 +36,7 @@
 </div>
 <div align="center">
 
-[![Discord][discord-shield]][discord-url]
-<br /><i>-- <a href="https://discord.gg/kBdkUBywz6" target="_blank">https://discord.gg/kBdkUBywz6</a> --</i>
+<br /><i>-- <a href="https://discord.gg/gjAYwwuFpV" target="_blank">https://discord.gg/gjAYwwuFpV</a> --</i>
 </div>
 
 # About
@@ -138,6 +137,6 @@ If you want to go rummaging around the code and are interested in any advanced c
 [license-shield]: https://img.shields.io/github/license/TrojanLij/STS.svg?style=for-the-badge
 [license-url]: https://github.com/TrojanLij/STS/blob/main/LICENSE.txt
 [discord-shield]: https://img.shields.io/discord/780429830184239144?label=Discord&style=for-the-badge
-[discord-url]: https://discord.gg/kBdkUBywz6
+[discord-url]: https://discord.gg/gjAYwwuFpV
 
 
