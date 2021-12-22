@@ -15,7 +15,7 @@ export const YEAR = DAY * 365;
 export const ENV_PATH = "./.env";
 export const CONFIG_PATH = "./conf.json";
 export const WEBHOOK_PATH = "./webhooks.json";
-export const COPY_ON_MOBILE = "https://ctf.surf/raw/";
+export const COPY_ON_MOBILE = "https://furry.surf/raw/";
 export const PARTNER_EMOJI = "<:partner:909102089513340979>";
 
 export enum Nitro {
